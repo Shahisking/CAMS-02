@@ -1,0 +1,8 @@
+{
+  "name": "College Asset Monitoring System (CAMS)",
+  "description": "Smart Asset Tracking \u0026 Maintenance System for Adithya Institute of Technology",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

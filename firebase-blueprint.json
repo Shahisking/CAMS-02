@@ -1,0 +1,56 @@
+{
+  "entities": {
+    "assets": {
+      "title": "Assets",
+      "description": "College assets tracking details",
+      "properties": {
+        "name": { "type": "string" },
+        "category": { "type": "string" },
+        "department": { "type": "string" },
+        "building": { "type": "string" },
+        "roomNumber": { "type": "string" },
+        "status": { "type": "string" },
+        "serialNumber": { "type": "string" },
+        "purchaseDate": { "type": "string" },
+        "purchaseCost": { "type": "number" },
+        "custodian": { "type": "string" }
+      },
+      "required": ["name", "category", "department", "status"]
+    },
+    "maintenanceTickets": {
+      "title": "Maintenance Tickets",
+      "description": "Maintenance and repair tickets",
+      "properties": {
+        "assetId": { "type": "string" },
+        "assetName": { "type": "string" },
+        "problem": { "type": "string" },
+        "requestedBy": { "type": "string" },
+        "requestDate": { "type": "string" },
+        "status": { "type": "string" },
+        "priority": { "type": "string" }
+      },
+      "required": ["assetId", "problem", "requestedBy"]
+    },
+    "users": {
+      "title": "Users",
+      "description": "User profiles",
+      "properties": {
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "role": { "type": "string" },
+        "department": { "type": "string" }
+      },
+      "required": ["email"]
+    }
+  },
+  "security_rules": [
+    "match /databases/{database}/documents {",
+    "  match /users/{userId} {",
+    "    allow read, write: if request.auth != null && request.auth.uid == userId;",
+    "  }",
+    "  match /{document=**} {",
+    "    allow read, write: if request.auth != null;",
+    "  }",
+    "}"
+  ]
+}
