@@ -51,13 +51,15 @@ export const ReportIssueModal: React.FC<ReportIssueModalProps> = ({
         remarks: `Submitted by ${currentUser?.email || 'User'} to System Monitor`,
       });
 
-      await addNotification(
-        `Issue Reported: ${selectedAsset?.name || selectedAssetId}`,
-        `${currentUser?.fullName || 'User'} (${currentUser?.role}) reported an issue to System Monitor: ${issueType}`,
-        'Maintenance',
-        'warning',
-        selectedAssetId
-      );
+      await addNotification({
+        title: `Issue Reported: ${selectedAsset?.name || selectedAssetId}`,
+        message: `${currentUser?.fullName || 'User'} (${currentUser?.role}) reported an issue to System Monitor: ${issueType}`,
+        type: 'warning',
+        category: 'Maintenance',
+        timestamp: new Date().toISOString(),
+        assetId: selectedAssetId,
+        read: false,
+      });
 
       setIsSuccess(true);
       setTimeout(() => {

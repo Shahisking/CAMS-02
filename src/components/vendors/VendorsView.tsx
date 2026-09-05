@@ -25,7 +25,8 @@ interface VendorsViewProps {
 }
 
 export const VendorsView: React.FC<VendorsViewProps> = ({ onOpenAddAssetModal }) => {
-  const { assets, vendors, addVendor, setActiveTab, setSelectedAssetId } = useApp();
+  const { assets, vendors, addVendor, setActiveTab, setSelectedAssetId, currentUser } = useApp();
+  const isMonitor = currentUser?.role === 'Monitor';
   const [search, setSearch] = useState('');
   const [selectedVendorForAssets, setSelectedVendorForAssets] = useState<VendorDetails | null>(null);
   const [isAddVendorModalOpen, setIsAddVendorModalOpen] = useState(false);
@@ -100,12 +101,14 @@ export const VendorsView: React.FC<VendorsViewProps> = ({ onOpenAddAssetModal })
               className="w-full pl-9 pr-4 py-2 bg-white border border-[#E5E7EB] rounded-lg text-xs sm:text-sm text-[#111827] focus:outline-none focus:border-[#2563EB] transition-colors"
             />
           </div>
-          <button
-            onClick={() => setIsAddVendorModalOpen(true)}
-            className="px-4 py-2 bg-[#2563EB] hover:bg-blue-700 text-white rounded-lg text-xs sm:text-sm font-semibold transition-colors flex items-center gap-2 shrink-0 cursor-pointer shadow-xs"
-          >
-            <Plus className="w-4 h-4" /> Add Vendor
-          </button>
+          {isMonitor && (
+            <button
+              onClick={() => setIsAddVendorModalOpen(true)}
+              className="px-4 py-2 bg-[#2563EB] hover:bg-blue-700 text-white rounded-lg text-xs sm:text-sm font-semibold transition-colors flex items-center gap-2 shrink-0 cursor-pointer shadow-xs"
+            >
+              <Plus className="w-4 h-4" /> Add Vendor
+            </button>
+          )}
         </div>
       </div>
 

@@ -1,0 +1,5 @@
+◇ injected env (0) from .env // tip: ⌘ enable debugging { debug: true }
+◇ injected env (0) from .env // tip: ⌘ enable debugging { debug: true }
+◇ injected env (0) from .env // tip: ◈ secrets for agents [www.dotenvx.com]
+SQLite connected → C:\Users\harsh\Downloads\CAMS\College-Asset-Management-System\backend\data\college_assets.db
+Server listening on http://localhost:5000

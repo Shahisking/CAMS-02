@@ -19,6 +19,7 @@ import { Department, Role, User } from '../../types';
 
 export const UserManagementView: React.FC = () => {
   const { users, addUser, updateUser, deleteUser, currentUser, failedAttemptsMap, unlockAccount } = useApp();
+  const isMonitor = currentUser?.role === 'Monitor';
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [fullName, setFullName] = useState('');
@@ -69,12 +70,14 @@ export const UserManagementView: React.FC = () => {
           </p>
         </div>
 
-        <button
-          onClick={() => setShowAddModal(true)}
-          className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold shadow-md shadow-blue-500/20 flex items-center gap-1.5 transition-all self-start sm:self-auto"
-        >
-          <UserPlus className="w-4 h-4" /> Add New User
-        </button>
+        {isMonitor && (
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold shadow-md shadow-blue-500/20 flex items-center gap-1.5 transition-all self-start sm:self-auto"
+          >
+            <UserPlus className="w-4 h-4" /> Add New User
+          </button>
+        )}
       </div>
 
       {/* User Table */}
@@ -115,6 +118,7 @@ export const UserManagementView: React.FC = () => {
                     {u.department}
                   </td>
                   <td className="py-3.5 px-4">
+                    {isMonitor ? (
                     <select
                       value={u.role}
                       onChange={(e) => updateUser(u.id, { role: e.target.value as Role })}
@@ -128,13 +132,16 @@ export const UserManagementView: React.FC = () => {
                       <option value="Technician">Technician</option>
                       <option value="Monitor">Monitor</option>
                     </select>
+                    ) : (
+                      <span className="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg text-[11px] font-semibold">{u.role}</span>
+                    )}
                   </td>
                   <td className="py-3.5 px-4">
                     {(failedAttemptsMap[u.email.toLowerCase()] || 0) >= 5 ? (
                       <span className="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300">
                         🔒 Locked (5 Failed)
                       </span>
-                    ) : (
+                    ) : isMonitor ? (
                       <span
                         onClick={() =>
                           updateUser(u.id, {
@@ -149,12 +156,20 @@ export const UserManagementView: React.FC = () => {
                       >
                         ● {u.status}
                       </span>
+                    ) : (
+                      <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
+                        u.status === 'Active'
+                          ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
+                          : 'bg-slate-200 text-slate-600'
+                      }`}>
+                        ● {u.status}
+                      </span>
                     )}
                   </td>
                   <td className="py-3.5 px-4 text-slate-400 font-mono text-[11px]">{u.lastLogin || 'Never'}</td>
                   <td className="py-3.5 px-4 text-center">
                     <div className="flex items-center justify-center gap-2">
-                      {(failedAttemptsMap[u.email.toLowerCase()] || 0) >= 5 && (
+                      {(failedAttemptsMap[u.email.toLowerCase()] || 0) >= 5 && isMonitor && (
                         <button
                           onClick={() => unlockAccount(u.email)}
                           className="px-2 py-1 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-lg text-[10px] transition-colors"
@@ -163,20 +178,24 @@ export const UserManagementView: React.FC = () => {
                           Unlock Account
                         </button>
                       )}
-                      <button
-                        onClick={() => handleResetPassword(u.id)}
-                        className="p-1.5 text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/40 rounded-lg transition-colors"
-                        title="Reset Password"
-                      >
-                        <KeyRound className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => deleteUser(u.id)}
-                        className="p-1.5 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg transition-colors"
-                        title="Remove User"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                      {isMonitor && (
+                        <>
+                        <button
+                          onClick={() => handleResetPassword(u.id)}
+                          className="p-1.5 text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/40 rounded-lg transition-colors"
+                          title="Reset Password"
+                        >
+                          <KeyRound className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => deleteUser(u.id)}
+                          className="p-1.5 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg transition-colors"
+                          title="Remove User"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                        </>
+                      )}
                     </div>
                     {resetSuccessId === u.id && (
                       <div className="text-[10px] text-emerald-500 font-bold mt-1">Reset Sent!</div>

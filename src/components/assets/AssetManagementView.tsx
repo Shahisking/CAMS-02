@@ -50,6 +50,8 @@ export const AssetManagementView: React.FC<AssetManagementViewProps> = ({
     setSelectedBuildingFilter,
     buildingBlocks,
     currentUser,
+    selectedChairTypeFilter,
+    setSelectedChairTypeFilter,
   } = useApp();
 
   const isMonitor = currentUser?.role === 'Monitor';
@@ -59,8 +61,9 @@ export const AssetManagementView: React.FC<AssetManagementViewProps> = ({
   const [statusFilter, setStatusFilter] = useState<string>('All');
   const [categoryFilter, setCategoryFilter] = useState<string>(selectedCategoryFilter || 'All');
   const [buildingFilter, setBuildingFilter] = useState<string>(selectedBuildingFilter || 'All');
+  const [chairTypeFilter, setChairTypeFilter] = useState<string>(selectedChairTypeFilter || 'All');
   const [roomFilter, setRoomFilter] = useState<string>('All');
-  const [sortField, setSortField] = useState<keyof Asset>('id');
+  const [sortField, setSortField] = useState<keyof Asset>('name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [editingAsset, setEditingAsset] = useState<Asset | null>(null);
   const [isImportModalOpen, setIsImportModalOpen] = useState<boolean>(false);
@@ -70,10 +73,24 @@ export const AssetManagementView: React.FC<AssetManagementViewProps> = ({
   useEffect(() => {
     if (selectedCategoryFilter) {
       setCategoryFilter(selectedCategoryFilter);
+      if (selectedCategoryFilter !== 'Chair') {
+        setSelectedChairTypeFilter(null);
+        setChairTypeFilter('All');
+      }
     } else if (selectedCategoryFilter === null) {
       setCategoryFilter('All');
+      setSelectedChairTypeFilter(null);
+      setChairTypeFilter('All');
     }
-  }, [selectedCategoryFilter]);
+  }, [selectedCategoryFilter, setSelectedChairTypeFilter]);
+
+  useEffect(() => {
+    if (selectedChairTypeFilter) {
+      setChairTypeFilter(selectedChairTypeFilter);
+    } else if (selectedChairTypeFilter === null) {
+      setChairTypeFilter('All');
+    }
+  }, [selectedChairTypeFilter]);
 
   useEffect(() => {
     if (selectedDepartmentFilter) {
@@ -98,29 +115,27 @@ export const AssetManagementView: React.FC<AssetManagementViewProps> = ({
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
 
-  // Reset pagination on filter changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, departmentFilter, conditionFilter, statusFilter, categoryFilter, buildingFilter, roomFilter]);
+  }, [searchQuery, departmentFilter, conditionFilter, statusFilter, categoryFilter, chairTypeFilter, buildingFilter, roomFilter]);
 
   // Filter logic on live DB records
   const filteredAssets = assets.filter((a) => {
     const matchesSearch =
-      a.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
       a.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       a.building.toLowerCase().includes(searchQuery.toLowerCase()) ||
       a.department.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      a.roomNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      a.assignedTo.toLowerCase().includes(searchQuery.toLowerCase());
+      a.roomNumber.toLowerCase().includes(searchQuery.toLowerCase());
 
     const matchesDept = departmentFilter === 'All' || a.department === departmentFilter;
     const matchesCond = conditionFilter === 'All' || a.condition === conditionFilter;
     const matchesStatus = statusFilter === 'All' || a.status === statusFilter;
     const matchesCategory = categoryFilter === 'All' || a.category === categoryFilter;
+    const matchesChairType = chairTypeFilter === 'All' || a.chair_type_id === chairTypeFilter;
     const matchesBuilding = buildingFilter === 'All' || a.building === buildingFilter;
     const matchesRoom = roomFilter === 'All' || a.roomNumber === roomFilter;
 
-    return matchesSearch && matchesDept && matchesCond && matchesStatus && matchesCategory && matchesBuilding && matchesRoom;
+    return matchesSearch && matchesDept && matchesCond && matchesStatus && matchesCategory && matchesChairType && matchesBuilding && matchesRoom;
   });
 
   // Sorting logic on DB records
@@ -158,11 +173,11 @@ export const AssetManagementView: React.FC<AssetManagementViewProps> = ({
   // Export CSV
   const handleExportCSV = () => {
     const headers = [
-      'Asset ID,Asset Name,Category,Department,Building Block,Floor,Room Number,Condition,Assigned To,Status,Purchase Date,Cost(INR)',
+      'Asset Name,Category,Department,Building Block,Floor,Room Number,Condition,Status',
     ];
     const rows = sortedAssets.map(
       (a) =>
-        `"${a.id}","${a.name}","${a.category}","${a.department}","${a.building}","${a.floor || 'Ground Floor'}","${a.roomNumber}","${a.condition}","${a.assignedTo}","${a.status}","${a.purchaseDate}",${a.purchaseCost}`
+        `"${a.name}","${a.category}","${a.department}","${a.building}","${a.floor || 'Ground Floor'}","${a.roomNumber}","${a.condition}","${a.status}"`
     );
     const csvContent = 'data:text/csv;charset=utf-8,' + [headers, ...rows].join('\n');
     const encodedUri = encodeURI(csvContent);
@@ -184,6 +199,19 @@ export const AssetManagementView: React.FC<AssetManagementViewProps> = ({
       {/* Top Header & Actions */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
+          {selectedCategoryFilter === 'Chair' && selectedChairTypeFilter && (
+            <div className="text-xs font-semibold text-blue-600 mb-2 flex items-center gap-1.5">
+              <span>Dashboard</span>
+              <span className="text-slate-400">&gt;</span>
+              <span>Categories</span>
+              <span className="text-slate-400">&gt;</span>
+              <span>Chair</span>
+              <span className="text-slate-400">&gt;</span>
+              <span>Chair Types</span>
+              <span className="text-slate-400">&gt;</span>
+              <span className="text-slate-800 dark:text-slate-200">{selectedChairTypeFilter}</span>
+            </div>
+          )}
           <h1 className="text-2xl sm:text-3xl heading-section text-slate-900 dark:text-white">
             Campus Asset Management
           </h1>
@@ -197,10 +225,10 @@ export const AssetManagementView: React.FC<AssetManagementViewProps> = ({
             <button
               onClick={() => setIsImportModalOpen(true)}
               className="px-3.5 py-2 bg-blue-50 dark:bg-slate-800 hover:bg-blue-100 dark:hover:bg-slate-700 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-slate-700 rounded-xl text-xs font-semibold shadow-2xs flex items-center gap-1.5 transition-all cursor-pointer"
-              title="Import Assets from CSV file"
+              title="Import Assets from CSV or Excel file"
             >
               <Upload className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-              <span>Import CSV</span>
+              <span>Import CSV/Excel</span>
             </button>
           )}
 
@@ -362,9 +390,6 @@ export const AssetManagementView: React.FC<AssetManagementViewProps> = ({
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-800 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                <th onClick={() => handleSort('id')} className="py-3.5 px-4 cursor-pointer hover:text-blue-600 transition-colors">
-                  <div className="flex items-center gap-1">Asset ID <ArrowUpDown className="w-3 h-3" /></div>
-                </th>
                 <th onClick={() => handleSort('name')} className="py-3.5 px-4 cursor-pointer hover:text-blue-600 transition-colors">
                   <div className="flex items-center gap-1">Asset Name <ArrowUpDown className="w-3 h-3" /></div>
                 </th>
@@ -384,22 +409,16 @@ export const AssetManagementView: React.FC<AssetManagementViewProps> = ({
                 <th onClick={() => handleSort('condition')} className="py-3.5 px-4 cursor-pointer hover:text-blue-600 transition-colors">
                   <div className="flex items-center gap-1">Condition <ArrowUpDown className="w-3 h-3" /></div>
                 </th>
-                <th onClick={() => handleSort('assignedTo')} className="py-3.5 px-4 cursor-pointer hover:text-blue-600 transition-colors">
-                  <div className="flex items-center gap-1">Assigned To <ArrowUpDown className="w-3 h-3" /></div>
-                </th>
                 <th onClick={() => handleSort('status')} className="py-3.5 px-4 cursor-pointer hover:text-blue-600 transition-colors">
                   <div className="flex items-center gap-1">Status <ArrowUpDown className="w-3 h-3" /></div>
                 </th>
-                <th onClick={() => handleSort('purchaseDate')} className="py-3.5 px-4 cursor-pointer hover:text-blue-600 transition-colors">
-                  <div className="flex items-center gap-1">Purchase Date <ArrowUpDown className="w-3 h-3" /></div>
-                </th>
-                <th className="py-3.5 px-4 text-center">Actions</th>
+                {isMonitor && <th className="py-3.5 px-4 text-right">Actions</th>}
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
               {paginatedAssets.length === 0 ? (
                 <tr>
-                  <td colSpan={12} className="py-12 text-center text-slate-500 font-semibold text-sm">
+                  <td colSpan={isMonitor ? 9 : 8} className="py-12 text-center text-slate-500 font-semibold text-sm">
                     No Assets Found
                   </td>
                 </tr>
@@ -409,10 +428,7 @@ export const AssetManagementView: React.FC<AssetManagementViewProps> = ({
                     key={asset.id}
                     className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
                   >
-                    <td className="py-3.5 px-4 font-mono font-bold text-blue-600 dark:text-blue-400">
-                      {asset.id}
-                    </td>
-                    <td className="py-3.5 px-4 font-bold text-slate-900 dark:text-white max-w-xs">
+                    <td className="py-3.5 px-4 font-bold text-slate-900 dark:text-white max-w-xs cursor-pointer hover:text-blue-600" onClick={() => onSelectAsset(asset.id)}>
                       <div className="truncate">
                         <div>{asset.name}</div>
                         <div className="text-[10px] text-slate-400 font-normal">
@@ -452,9 +468,6 @@ export const AssetManagementView: React.FC<AssetManagementViewProps> = ({
                         {asset.condition}
                       </span>
                     </td>
-                    <td className="py-3.5 px-4 font-medium text-slate-700 dark:text-slate-300">
-                      {asset.assignedTo}
-                    </td>
                     <td className="py-3.5 px-4">
                       <span
                         className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold ${
@@ -468,50 +481,22 @@ export const AssetManagementView: React.FC<AssetManagementViewProps> = ({
                         ● {asset.status}
                       </span>
                     </td>
-                    <td className="py-3.5 px-4 font-mono text-slate-600 dark:text-slate-400 text-[11px]">
-                      {asset.purchaseDate}
-                    </td>
-                    <td className="py-3.5 px-4 text-center">
-                      <div className="flex items-center justify-center gap-1.5">
+                    {isMonitor && (
+                      <td className="py-3.5 px-4 text-right">
                         <button
-                          onClick={() => onSelectAsset(asset.id)}
-                          className="p-1.5 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/50 rounded-lg transition-colors cursor-pointer"
-                          title="View Asset Details"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (window.confirm('Are you sure you want to delete this asset?')) {
+                              deleteAsset(asset.id);
+                            }
+                          }}
+                          className="p-1.5 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-md transition-colors"
+                          title="Delete Asset"
                         >
-                          <Eye className="w-4 h-4" />
+                          <Trash2 className="w-4 h-4" />
                         </button>
-
-                        {isMonitor ? (
-                          <>
-                            <button
-                              onClick={() => setEditingAsset(asset)}
-                              className="p-1.5 text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/50 rounded-lg transition-colors cursor-pointer"
-                              title="Edit Asset"
-                            >
-                              <Edit className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={() => deleteAsset(asset.id)}
-                              className="p-1.5 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 rounded-lg transition-colors cursor-pointer"
-                              title="Delete Asset"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </>
-                        ) : (
-                          <button
-                            onClick={() => {
-                              setReportIssueAssetId(asset.id);
-                              setIsReportIssueOpen(true);
-                            }}
-                            className="p-1.5 text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/50 rounded-lg transition-colors cursor-pointer"
-                            title="Report Issue / Request to Monitor"
-                          >
-                            <Wrench className="w-4 h-4" />
-                          </button>
-                        )}
-                      </div>
-                    </td>
+                      </td>
+                    )}
                   </tr>
                 ))
               )}

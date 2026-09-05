@@ -62,9 +62,6 @@ export const AssetDetailModal: React.FC<AssetDetailModalProps> = ({
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-slate-100 dark:border-slate-800">
           <div>
-            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 text-xs font-mono font-bold mb-1">
-              {asset.id}
-            </div>
             <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white">{asset.name}</h2>
             <p className="text-xs text-slate-500">{asset.category} • {asset.department}</p>
           </div>
@@ -88,8 +85,7 @@ export const AssetDetailModal: React.FC<AssetDetailModalProps> = ({
           <div className="md:col-span-4 space-y-4">
             <div className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200 dark:border-slate-700/60 flex items-center justify-between">
               <div>
-                <div className="text-xs font-bold text-slate-900 dark:text-white">QR Tag ID</div>
-                <div className="text-[11px] font-mono text-slate-500">{asset.id}</div>
+                <div className="text-xs font-bold text-slate-900 dark:text-white">QR Tag Label</div>
                 <button
                   onClick={handlePrintQR}
                   className="mt-2 inline-flex items-center gap-1.5 text-xs text-blue-600 dark:text-blue-400 font-semibold hover:underline"
@@ -134,11 +130,6 @@ export const AssetDetailModal: React.FC<AssetDetailModalProps> = ({
                 <span className="text-slate-400 font-medium">Warranty Expiry</span>
                 <div className="font-bold text-slate-900 dark:text-white mt-0.5">{asset.warrantyExpiry}</div>
               </div>
-
-              <div className="p-3 bg-slate-50 dark:bg-slate-800/40 rounded-xl">
-                <span className="text-slate-400 font-medium">Assigned Custodian</span>
-                <div className="font-bold text-slate-900 dark:text-white mt-0.5">{asset.assignedTo}</div>
-              </div>
             </div>
 
             {asset.specifications && (
@@ -174,16 +165,18 @@ export const AssetDetailModal: React.FC<AssetDetailModalProps> = ({
                 <ArrowLeftRight className="w-4 h-4" /> Transfer Location
               </button>
 
-              <button
-                onClick={() => {
-                  deleteAsset(asset.id);
-                  onClose();
-                }}
-                className="p-2.5 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 border border-rose-200 dark:border-rose-900/40 rounded-xl"
-                title="Delete Asset"
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
+              {isMonitor && (
+                <button
+                  onClick={() => {
+                    deleteAsset(asset.id);
+                    onClose();
+                  }}
+                  className="p-2.5 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 border border-rose-200 dark:border-rose-900/40 rounded-xl"
+                  title="Delete Asset"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              )}
             </div>
           </div>
         </div>

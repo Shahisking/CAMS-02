@@ -12,7 +12,8 @@ import {
 import { useApp } from '../../context/AppContext';
 
 export const NotificationsView: React.FC = () => {
-  const { notifications, markNotificationRead, clearAllNotifications } = useApp();
+  const { notifications, markNotificationRead, clearAllNotifications, currentUser } = useApp();
+  const isMonitor = currentUser?.role === 'Monitor';
   const [filterCategory, setFilterCategory] = useState<string>('All');
 
   const filtered = notifications.filter(
@@ -31,12 +32,14 @@ export const NotificationsView: React.FC = () => {
           </p>
         </div>
 
-        <button
-          onClick={clearAllNotifications}
-          className="px-4 py-2 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/40 text-rose-600 dark:text-rose-400 font-semibold rounded-xl text-xs flex items-center gap-1.5 hover:bg-rose-100 transition-all self-start sm:self-auto"
-        >
-          <Trash2 className="w-4 h-4" /> Clear All Notifications
-        </button>
+        {isMonitor && (
+          <button
+            onClick={clearAllNotifications}
+            className="px-4 py-2 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/40 text-rose-600 dark:text-rose-400 font-semibold rounded-xl text-xs flex items-center gap-1.5 hover:bg-rose-100 transition-all self-start sm:self-auto"
+          >
+            <Trash2 className="w-4 h-4" /> Clear All Notifications
+          </button>
+        )}
       </div>
 
       {/* Categories Filter */}

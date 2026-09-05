@@ -12,7 +12,8 @@ import {
 import { useApp } from '../../context/AppContext';
 
 export const AllocationView: React.FC = () => {
-  const { assets, allocationLogs, transferAsset } = useApp();
+  const { assets, allocationLogs, transferAsset, currentUser } = useApp();
+  const isMonitor = currentUser?.role === 'Monitor';
 
   const [selectedAssetId, setSelectedAssetId] = useState<string>(assets[0]?.id || '');
   const [toLocation, setToLocation] = useState('');
@@ -41,6 +42,18 @@ export const AllocationView: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#F8FAFC] py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-[1200px] mx-auto space-y-10">
+        {!isMonitor ? (
+          <div className="bg-white rounded-[20px] p-6 sm:p-10 border border-[#E2E8F0] shadow-[0_10px_30px_rgba(15,23,42,0.08)] text-center">
+            <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-4">
+              <ArrowLeftRight className="w-8 h-8 text-amber-600" />
+            </div>
+            <h2 className="text-xl font-bold text-slate-900 mb-2">Asset Transfer Restricted</h2>
+            <p className="text-sm text-slate-500 max-w-md mx-auto">
+              Only the System Monitor can process asset transfers. Please submit a transfer request through the Requests module, and the Monitor will handle it.
+            </p>
+          </div>
+        ) : (
+          <>
         {/* Main Form Container */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
@@ -114,28 +127,7 @@ export const AllocationView: React.FC = () => {
                       <div className="text-base font-bold text-[#0F172A]">
                         {currentAsset.name}
                       </div>
-                      <div className="text-sm text-[#64748B] flex items-center gap-2">
-                        <MapPin className="w-4 h-4 text-[#94A3B8]" />
-                        <span>
-                          Current Location: <strong className="text-[#334155]">{currentAsset.building} - {currentAsset.roomNumber}</strong>
-                        </span>
                       </div>
-                      <div className="text-sm text-[#64748B] flex items-center gap-2">
-                        <User className="w-4 h-4 text-[#94A3B8]" />
-                        <span>
-                          Current Custodian: <strong className="text-[#334155]">{currentAsset.assignedTo}</strong>
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="sm:text-right shrink-0 border-t sm:border-t-0 pt-3 sm:pt-0 border-[#E2E8F0]">
-                    <span className="inline-block px-3 py-1 rounded-full text-xs font-bold bg-[#DCFCE7] text-[#16A34A]">
-                      {currentAsset.status}
-                    </span>
-                    <div className="text-xs text-[#64748B] mt-1 font-mono">
-                      Serial: {currentAsset.serialNumber || currentAsset.id}
-                    </div>
                   </div>
                 </div>
               )}
@@ -277,6 +269,8 @@ export const AllocationView: React.FC = () => {
             )}
           </div>
         </motion.div>
+          </>
+        )}
       </div>
     </div>
   );

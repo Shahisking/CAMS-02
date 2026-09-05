@@ -45,10 +45,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 }) => {
   const { assets, maintenanceTickets, allocationLogs, setActiveTab, currentUser } = useApp();
 
-  const isSystemMonitor =
-    currentUser?.role === 'Monitor' ||
-    currentUser?.role?.toLowerCase().includes('monitor') ||
-    currentUser?.email?.toLowerCase().includes('monitor');
+  const isSystemMonitor = currentUser?.role === 'Monitor';
 
   // Stat numbers derived from live database assets
   const totalAssets = assets.length;

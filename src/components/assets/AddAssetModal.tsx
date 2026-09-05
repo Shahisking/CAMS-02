@@ -29,13 +29,11 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
   const [floor, setFloor] = useState<FloorName>(initialFloor);
   const [roomNumber, setRoomNumber] = useState<string>(initialRoomNumber);
   const [buildingError, setBuildingError] = useState<string>('');
-  const [purchaseDate, setPurchaseDate] = useState(new Date().toISOString().split('T')[0]);
+  const [condition, setCondition] = useState<AssetCondition>('New');
   const [purchaseCost, setPurchaseCost] = useState<number>(45000);
   const [vendor, setVendor] = useState('Dell India Pvt Ltd');
   const [warrantyExpiry, setWarrantyExpiry] = useState('2028-03-31');
-  const [condition, setCondition] = useState<AssetCondition>('New');
   const [status, setStatus] = useState<AssetStatus>('Active');
-  const [assignedTo, setAssignedTo] = useState('AI & Data Science Lab');
   const [assignedType, setAssignedType] = useState<'Faculty' | 'Department' | 'Lab' | 'Classroom' | 'Hostel' | 'Store Room'>('Lab');
   const [imageUrl, setImageUrl] = useState('');
   const [specifications, setSpecifications] = useState('');
@@ -63,13 +61,11 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
       building: building as BuildingType,
       floor,
       roomNumber,
-      purchaseDate,
       purchaseCost: Number(purchaseCost) || 0,
       vendor,
       warrantyExpiry,
       condition,
       status,
-      assignedTo,
       assignedType,
       imageUrl,
       specifications,
@@ -138,6 +134,31 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
                 <option value="Library Assets">Library Assets</option>
                 <option value="Hostel Assets">Hostel Assets</option>
                 <option value="Electrical Equipment">Electrical Equipment</option>
+                <option value="Fans">Fans</option>
+                <option value="LED Lights">LED Lights</option>
+                <option value="Mini Notice Board">Mini Notice Board</option>
+                <option value="Dustbin">Dustbin</option>
+                <option value="Student Bench">Student Bench</option>
+                <option value="Open Rack">Open Rack</option>
+                <option value="Closed Bureau">Closed Bureau</option>
+                <option value="Projector Screen">Projector Screen</option>
+                <option value="Black Board">Black Board</option>
+                <option value="Computer Table">Computer Table</option>
+                <option value="Fire Extinguisher">Fire Extinguisher</option>
+                <option value="Staff Cabin Table">Staff Cabin Table</option>
+                <option value="Staff Table">Staff Table</option>
+                <option value="Small Bench">Small Bench</option>
+                <option value="Long Bench">Long Bench</option>
+                <option value="Drawer">Drawer</option>
+                <option value="First Aid Kit Box">First Aid Kit Box</option>
+                <option value="White Board">White Board</option>
+                <option value="Cupboard">Cupboard</option>
+                <option value="Long Lab Switch Table">Long Lab Switch Table</option>
+                <option value="Lab Stool">Lab Stool</option>
+                <option value="Washbasin">Washbasin</option>
+                <option value="Microphone Speaker">Microphone Speaker</option>
+                <option value="Camera">Camera</option>
+                <option value="Speaker">Speaker</option>
                 <option value="Other Assets">Other Assets</option>
               </select>
             </div>
@@ -222,19 +243,6 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
                 <option value="Damaged">Damaged</option>
               </select>
             </div>
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
-              Assigned To
-            </label>
-            <input
-              type="text"
-              value={assignedTo}
-              onChange={(e) => setAssignedTo(e.target.value)}
-              placeholder="Dr. R. Sundaram / AI Lab"
-              className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs rounded-xl px-3 py-2.5 outline-none"
-            />
           </div>
 
           <div>

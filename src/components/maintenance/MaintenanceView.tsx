@@ -255,7 +255,9 @@ export const MaintenanceView: React.FC = () => {
                   >
                     <option value="Pending">Set Pending</option>
                     <option value="In Progress">Set In Progress</option>
-                    <option value="Completed">Set Completed</option>
+                    <option value="Completed" disabled={!isSystemMonitor}>
+                      {isSystemMonitor ? 'Set Completed' : 'Set Completed (Monitor Only)'}
+                    </option>
                     <option value="Rejected">Set Rejected</option>
                   </select>
                 </div>

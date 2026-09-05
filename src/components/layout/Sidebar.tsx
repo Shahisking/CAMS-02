@@ -20,6 +20,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Plus,
+  Activity,
 } from 'lucide-react';
 import { useApp, ActiveTab } from '../../context/AppContext';
 import { Role } from '../../types';
@@ -73,8 +74,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
     },
     { id: 'reports', label: 'Reports', icon: <BarChart2 className="w-4 h-4" /> },
     { id: 'audit-logs', label: 'Audit Logs', icon: <ShieldCheck className="w-4 h-4" /> },
-    { id: 'users', label: 'User Management', icon: <Users className="w-4 h-4" />, roles: ['Admin', 'Monitor'] },
-    { id: 'settings', label: 'Settings', icon: <Settings className="w-4 h-4" />, roles: ['Admin', 'Monitor'] },
+    { id: 'users', label: 'User Management', icon: <Users className="w-4 h-4" />, roles: ['Monitor'] },
+    { id: 'settings', label: 'Settings', icon: <Settings className="w-4 h-4" />, roles: ['Monitor'] },
+    { id: 'system-monitor', label: 'System Monitor', icon: <Activity className="w-4 h-4" />, roles: ['Monitor'] },
   ];
 
   const isMonitor = currentUser?.role === 'Monitor';

@@ -121,7 +121,8 @@ interface DepartmentsViewProps {
 }
 
 export const DepartmentsView: React.FC<DepartmentsViewProps> = ({ onOpenAddAssetModal }) => {
-  const { assets, setActiveTab, setSelectedDepartmentFilter } = useApp();
+  const { assets, setActiveTab, setSelectedDepartmentFilter, currentUser } = useApp();
+  const isMonitor = currentUser?.role === 'Monitor';
   const [search, setSearch] = useState('');
 
   const filteredDepts = DEPARTMENTS_DATA.filter(
@@ -164,7 +165,7 @@ export const DepartmentsView: React.FC<DepartmentsViewProps> = ({ onOpenAddAsset
               className="w-full pl-9 pr-4 py-2 bg-white border border-[#E5E7EB] rounded-lg text-xs sm:text-sm text-[#111827] focus:outline-none focus:border-[#2563EB] transition-colors"
             />
           </div>
-          {onOpenAddAssetModal && (
+          {onOpenAddAssetModal && isMonitor && (
             <button
               onClick={onOpenAddAssetModal}
               className="px-4 py-2 bg-[#2563EB] hover:bg-blue-700 text-white rounded-lg text-xs sm:text-sm font-semibold transition-colors flex items-center gap-2 shrink-0 cursor-pointer shadow-xs"

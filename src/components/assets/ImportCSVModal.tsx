@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Upload, FileSpreadsheet, Download, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import * as XLSX from 'xlsx';
 import { useApp } from '../../context/AppContext';
 import { CategoryType, Department, Building as BuildingType, AssetCondition, AssetStatus, FloorName, Asset } from '../../types';
 
@@ -96,8 +97,10 @@ export const ImportCSVModal: React.FC<ImportCSVModalProps> = ({ isOpen, onClose 
   };
 
   const processFile = (selectedFile: File) => {
-    if (!selectedFile.name.toLowerCase().endsWith('.csv')) {
-      setError('Please select a valid CSV file.');
+    const isCSV = selectedFile.name.toLowerCase().endsWith('.csv');
+    const isExcel = selectedFile.name.toLowerCase().endsWith('.xlsx') || selectedFile.name.toLowerCase().endsWith('.xls');
+    if (!isCSV && !isExcel) {
+      setError('Please select a valid CSV or Excel file.');
       return;
     }
     setError('');
@@ -106,21 +109,44 @@ export const ImportCSVModal: React.FC<ImportCSVModalProps> = ({ isOpen, onClose 
 
     const reader = new FileReader();
     reader.onload = (event) => {
-      const content = event.target?.result as string;
-      if (content) {
-        const records = parseCSV(content);
-        if (records.length === 0) {
-          setError('No valid data records found in CSV. Please ensure the file has a header row and data.');
-          setParsedData([]);
-        } else {
-          setParsedData(records);
+      if (isExcel) {
+        try {
+          const data = new Uint8Array(event.target?.result as ArrayBuffer);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const firstSheet = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[firstSheet];
+          const records = XLSX.utils.sheet_to_json(worksheet, { raw: false, defval: '' }) as Record<string, string>[];
+          if (records.length === 0) {
+            setError('No valid data records found in Excel file.');
+            setParsedData([]);
+          } else {
+            setParsedData(records);
+          }
+        } catch (err) {
+          setError('Failed to parse Excel file.');
+        }
+      } else {
+        const content = event.target?.result as string;
+        if (content) {
+          const records = parseCSV(content);
+          if (records.length === 0) {
+            setError('No valid data records found in CSV. Please ensure the file has a header row and data.');
+            setParsedData([]);
+          } else {
+            setParsedData(records);
+          }
         }
       }
     };
     reader.onerror = () => {
       setError('Failed to read the file.');
     };
-    reader.readAsText(selectedFile);
+    
+    if (isExcel) {
+      reader.readAsArrayBuffer(selectedFile);
+    } else {
+      reader.readAsText(selectedFile);
+    }
   };
 
   const handleDrop = (e: React.DragEvent) => {
@@ -153,31 +179,19 @@ export const ImportCSVModal: React.FC<ImportCSVModalProps> = ({ isOpen, onClose 
       'Floor',
       'Room Number',
       'Condition',
-      'Assigned To',
       'Status',
-      'Purchase Date',
-      'Purchase Cost (INR)',
-      'Vendor',
-      'Warranty Expiry',
-      'Assigned Type',
     ];
-    const sampleRow = [
-      'Dell OptiPlex 7090 Desktop',
-      'Computer',
-      'Computer Science & Engineering',
-      'S Block',
-      'First Floor',
-      'S110',
-      'New',
-      'Dr. R. Sundaram',
-      'Active',
-      '2025-06-15',
-      '65000',
-      'Dell India Pvt Ltd',
-      '2028-06-15',
-      'Faculty',
+    const sampleRows = [
+      ['Dell OptiPlex 7090 Desktop', 'Computer', 'Computer Science & Engineering', 'S Block', 'First Floor', 'S110', 'New', 'Active'],
+      ['HP LaserJet Pro M404dn', 'Printer', 'Information Technology', 'S Block', 'Ground Floor', 'S005', 'Good', 'Active'],
+      ['Epson EB-X51 Projector', 'Projector', 'Electronics & Communication', 'N Block', 'Second Floor', 'N201', 'Good', 'Active'],
+      ['Iris Maxima 400 Biometric', 'Biometric', 'Administrative Office', 'S Block', 'Ground Floor', 'S001', 'New', 'Active'],
+      ['Samsung 55" Crystal UHD TV', 'Display', 'Computer Science & Engineering', 'S Block', 'Third Floor', 'S302', 'Good', 'Under Maintenance'],
     ];
-    const csvContent = 'data:text/csv;charset=utf-8,' + [templateHeaders.join(','), sampleRow.join(',')].join('\n');
+    const csvContent = 'data:text/csv;charset=utf-8,' + [
+      templateHeaders.join(','),
+      ...sampleRows.map(row => row.map(v => `"${v}"`).join(','))
+    ].join('\n');
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
@@ -192,23 +206,20 @@ export const ImportCSVModal: React.FC<ImportCSVModalProps> = ({ isOpen, onClose 
     setIsImporting(true);
     setError('');
     let importedCount = 0;
+    const rowErrors: string[] = [];
 
-    try {
-      for (const rec of parsedData) {
+    for (let i = 0; i < parsedData.length; i++) {
+      const rec = parsedData[i];
+      try {
         const name = getFieldValue(rec, ['asset_name', 'assetname', 'name', 'title']) || 'Imported Asset';
         const category = (getFieldValue(rec, ['category', 'categorytype']) || 'Computer') as CategoryType;
         const department = (getFieldValue(rec, ['department', 'dept']) || 'Computer Science & Engineering') as Department;
-        const building = (getFieldValue(rec, ['buildingblock', 'building_block', 'block', 'building']) || 'S Block') as BuildingType;
+        const buildingRaw = getFieldValue(rec, ['buildingblock', 'building_block', 'block', 'building']) || 'S Block';
+        const building = buildingRaw.replace(/-/g, ' ') as BuildingType;
         const floor = (getFieldValue(rec, ['floor']) || 'Ground Floor') as FloorName;
         const roomNumber = getFieldValue(rec, ['roomnumber', 'room_number', 'room']) || 'G-01';
-        const purchaseDate = getFieldValue(rec, ['purchasedate', 'purchase_date', 'date']) || new Date().toISOString().split('T')[0];
-        const purchaseCost = Number(getFieldValue(rec, ['purchasecost', 'purchase_cost', 'cost', 'price'])) || 0;
-        const vendor = getFieldValue(rec, ['vendor', 'supplier']) || 'Standard Supplier';
-        const warrantyExpiry = getFieldValue(rec, ['warrantyexpiry', 'warranty_expiry', 'warranty']) || '2027-12-31';
         const condition = (getFieldValue(rec, ['condition']) || 'Good') as AssetCondition;
         const status = (getFieldValue(rec, ['status']) || 'Active') as AssetStatus;
-        const assignedTo = getFieldValue(rec, ['assignedto', 'assigned_to', 'assigned']) || department;
-        const assignedType = (getFieldValue(rec, ['assignedtype', 'assigned_type']) || 'Department') as Asset['assignedType'];
 
         const newAssetData: Omit<Asset, 'id'> = {
           name,
@@ -217,32 +228,36 @@ export const ImportCSVModal: React.FC<ImportCSVModalProps> = ({ isOpen, onClose 
           building,
           floor,
           roomNumber,
-          purchaseDate,
-          purchaseCost,
-          vendor,
-          warrantyExpiry,
+          purchaseCost: 0,
+          vendor: 'Standard Supplier',
+          warrantyExpiry: '2027-12-31',
           condition,
           status,
-          assignedTo,
-          assignedType,
+          assignedType: 'Department',
         };
 
         await addAsset(newAssetData);
         importedCount++;
+      } catch (err: any) {
+        console.error(`Row ${i + 1} failed:`, err);
+        const errMsg = err?.response?.data?.message || err?.message || 'Unknown error';
+        rowErrors.push(`Row ${i + 1} (${getFieldValue(rec, ['asset_name', 'assetname', 'name', 'title'])}): ${errMsg}`);
       }
+    }
 
-      setImportCount(importedCount);
+    setImportCount(importedCount);
+    setIsImporting(false);
+
+    if (rowErrors.length > 0) {
+      setError(`Imported ${importedCount} assets successfully. ${rowErrors.length} failed. Reasons: ${rowErrors.slice(0, 3).join(' | ')}${rowErrors.length > 3 ? '...' : ''}`);
+    } else {
       setTimeout(() => {
         onClose();
         setFile(null);
         setParsedData([]);
         setImportCount(null);
-      }, 1500);
-    } catch (err) {
-      console.error(err);
-      setError('An error occurred while importing records to the database.');
-    } finally {
-      setIsImporting(false);
+        setError('');
+      }, 2000);
     }
   };
 
@@ -262,9 +277,9 @@ export const ImportCSVModal: React.FC<ImportCSVModalProps> = ({ isOpen, onClose 
                 <FileSpreadsheet className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white">Import Assets from CSV</h3>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white">Import Assets from CSV or Excel</h3>
                 <p className="text-xs text-slate-500 dark:text-slate-400">
-                  Upload a CSV spreadsheet to bulk add asset records directly into the live database.
+                  Upload a CSV or Excel spreadsheet to bulk add asset records directly into the live database.
                 </p>
               </div>
             </div>
@@ -280,21 +295,31 @@ export const ImportCSVModal: React.FC<ImportCSVModalProps> = ({ isOpen, onClose 
           {/* Modal Body */}
           <div className="p-6 space-y-5 overflow-y-auto flex-1">
             {/* Download Template & Instructions */}
-            <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200/80 dark:border-slate-700/60">
-              <div className="space-y-0.5">
-                <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Need a sample format?</span>
-                <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                  Download our sample CSV template with standard header columns.
-                </p>
+            <div className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200/80 dark:border-slate-700/60 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Need a sample format?</span>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                    Download our sample CSV template with 5 example asset records.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleDownloadTemplate}
+                  className="px-3 py-1.5 bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-600 text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-colors shadow-2xs cursor-pointer"
+                >
+                  <Download className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                  <span>Download Template</span>
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={handleDownloadTemplate}
-                className="px-3 py-1.5 bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-600 text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-colors shadow-2xs cursor-pointer"
-              >
-                <Download className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-                <span>Download Template</span>
-              </button>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[10px] text-slate-500 dark:text-slate-400">
+                <span><b className="text-slate-700 dark:text-slate-300">Category:</b> Computer, Printer, Projector, Biometric, Display, Furniture, Network, Other</span>
+                <span><b className="text-slate-700 dark:text-slate-300">Condition:</b> New, Good, Fair, Poor, Damaged</span>
+                <span><b className="text-slate-700 dark:text-slate-300">Building:</b> S Block, N Block, W Block</span>
+                <span><b className="text-slate-700 dark:text-slate-300">Status:</b> Active, Under Maintenance, Retired, Lost</span>
+                <span><b className="text-slate-700 dark:text-slate-300">Floor:</b> Ground Floor, First Floor, Second Floor, Third Floor</span>
+                <span><b className="text-slate-700 dark:text-slate-300">Department:</b> Computer Science & Engineering, IT, ECE, EEE, Mech, Civil, AI & DS</span>
+              </div>
             </div>
 
             {/* Drag & Drop Upload Zone */}
@@ -313,7 +338,7 @@ export const ImportCSVModal: React.FC<ImportCSVModalProps> = ({ isOpen, onClose 
             >
               <input
                 type="file"
-                accept=".csv"
+                accept=".csv, .xlsx, .xls"
                 id="csv-file-input"
                 className="hidden"
                 onChange={handleFileChange}
@@ -326,9 +351,9 @@ export const ImportCSVModal: React.FC<ImportCSVModalProps> = ({ isOpen, onClose 
                   <span className="text-sm font-semibold text-blue-600 dark:text-blue-400 hover:underline">
                     Click to browse
                   </span>{' '}
-                  <span className="text-sm text-slate-500 dark:text-slate-400">or drag & drop your CSV file here</span>
+                  <span className="text-sm text-slate-500 dark:text-slate-400">or drag & drop your file here</span>
                 </div>
-                <span className="text-[11px] text-slate-400">Supports UTF-8 CSV files up to 10MB</span>
+                <span className="text-[11px] text-slate-400">Supports CSV and Excel files up to 10MB</span>
               </label>
             </div>
 
@@ -362,23 +387,27 @@ export const ImportCSVModal: React.FC<ImportCSVModalProps> = ({ isOpen, onClose 
                   <table className="w-full text-left border-collapse text-xs">
                     <thead>
                       <tr className="bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 font-bold uppercase text-[10px]">
-                        <th className="p-2.5">Asset Name</th>
+                        <th className="p-2.5">Name</th>
                         <th className="p-2.5">Category</th>
-                        <th className="p-2.5">Department</th>
+                        <th className="p-2.5">Dept</th>
                         <th className="p-2.5">Building</th>
+                        <th className="p-2.5">Floor</th>
                         <th className="p-2.5">Room</th>
+                        <th className="p-2.5">Cond</th>
+                        <th className="p-2.5">Status</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-medium">
                       {parsedData.slice(0, 5).map((row, idx) => (
                         <tr key={idx} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/40 text-slate-700 dark:text-slate-300">
-                          <td className="p-2.5 font-semibold text-slate-900 dark:text-white">
-                            {getFieldValue(row, ['asset_name', 'assetname', 'name', 'title']) || 'Untitled Asset'}
-                          </td>
-                          <td className="p-2.5">{getFieldValue(row, ['category', 'categorytype']) || 'Computer'}</td>
-                          <td className="p-2.5">{getFieldValue(row, ['department', 'dept']) || 'CSE'}</td>
-                          <td className="p-2.5">{getFieldValue(row, ['buildingblock', 'building_block', 'block', 'building']) || 'S Block'}</td>
-                          <td className="p-2.5 font-mono">{getFieldValue(row, ['roomnumber', 'room_number', 'room']) || 'G-01'}</td>
+                          <td className="p-2.5">{getFieldValue(row, ['asset_name', 'assetname', 'name', 'title'])}</td>
+                          <td className="p-2.5">{getFieldValue(row, ['category', 'categorytype'])}</td>
+                          <td className="p-2.5">{getFieldValue(row, ['department', 'dept'])}</td>
+                          <td className="p-2.5">{getFieldValue(row, ['buildingblock', 'building_block', 'block', 'building'])}</td>
+                          <td className="p-2.5">{getFieldValue(row, ['floor'])}</td>
+                          <td className="p-2.5">{getFieldValue(row, ['roomnumber', 'room_number', 'room'])}</td>
+                          <td className="p-2.5">{getFieldValue(row, ['condition'])}</td>
+                          <td className="p-2.5">{getFieldValue(row, ['status'])}</td>
                         </tr>
                       ))}
                     </tbody>

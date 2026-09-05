@@ -2,10 +2,10 @@ import { Asset, MaintenanceTicket, AllocationHistory, HistoryEvent, User, Notifi
 
 export const INITIAL_ROOMS: RoomItem[] = [
   // S Block - Ground Floor
-  { id: 'RM-S001', roomNumber: 'S001', roomName: 'Principal Office & Reception', block: 'S Block', floor: 'Ground Floor', department: 'Administrative Office', capacity: 15, roomType: 'Office', status: 'Active', description: 'Executive Suite & VIP Conference Desk' },
-  { id: 'RM-S002', roomNumber: 'S002', roomName: 'CSE Department HOD Office', block: 'S Block', floor: 'Ground Floor', department: 'Computer Science & Engineering', capacity: 10, roomType: 'Office', status: 'Active', description: 'Head of Department Office & Academic Records' },
-  { id: 'RM-S003', roomNumber: 'S003', roomName: 'Faculty Cabins & Meeting Room', block: 'S Block', floor: 'Ground Floor', department: 'Computer Science & Engineering', capacity: 25, roomType: 'Staff Room', status: 'Active', description: 'Senior Professors Cabins' },
-  { id: 'RM-S004', roomNumber: 'Seminar Hall 1', roomName: 'S Block Central Seminar Hall', block: 'S Block', floor: 'Ground Floor', department: 'Computer Science & Engineering', capacity: 150, roomType: 'Seminar Hall', status: 'Active', description: 'Air-conditioned Auditorium with Surround Audio & Dual Projectors' },
+  { id: 'RM-S110-GF', roomNumber: 'S110', roomName: 'S110 Room', block: 'S Block', floor: 'Ground Floor', department: 'General', capacity: 60, roomType: 'Classroom', status: 'Active' },
+  { id: 'RM-S103-GF', roomNumber: 'S103', roomName: 'AI&DS Department', block: 'S Block', floor: 'Ground Floor', department: 'Artificial Intelligence & Data Science', capacity: 40, roomType: 'Office', status: 'Active' },
+  { id: 'RM-S108-GF', roomNumber: 'S108', roomName: 'S108 Room', block: 'S Block', floor: 'Ground Floor', department: 'General', capacity: 60, roomType: 'Classroom', status: 'Active' },
+  { id: 'RM-S104-GF', roomNumber: 'S104', roomName: 'Communication Lab', block: 'S Block', floor: 'Ground Floor', department: 'Electronics & Communication', capacity: 50, roomType: 'Laboratory', status: 'Active' },
 
   // S Block - First Floor
   { id: 'RM-S101', roomNumber: 'S101', roomName: 'Smart Classroom 101', block: 'S Block', floor: 'First Floor', department: 'Computer Science & Engineering', capacity: 65, roomType: 'Classroom', status: 'Active', description: 'Audio-Visual Enabled Interactive Lecture Hall' },
@@ -34,10 +34,9 @@ export const INITIAL_ROOMS: RoomItem[] = [
   { id: 'RM-S303', roomNumber: 'S303', roomName: 'Capstone Project Studio', block: 'S Block', floor: 'Third Floor', department: 'Computer Science & Engineering', capacity: 40, roomType: 'Laboratory', status: 'Active' },
 
   // N Block
-  { id: 'RM-N001', roomNumber: 'N001', roomName: 'ECE Department HOD Office', block: 'N Block', floor: 'Ground Floor', department: 'Electronics & Communication', capacity: 12, roomType: 'Office', status: 'Active' },
-  { id: 'RM-N101', roomNumber: 'N101', roomName: 'Digital Signal Processing Lab', block: 'N Block', floor: 'First Floor', department: 'Electronics & Communication', capacity: 50, roomType: 'Laboratory', status: 'Active' },
-  { id: 'RM-N102', roomNumber: 'N102', roomName: 'Microprocessor & Microcontroller Lab', block: 'N Block', floor: 'First Floor', department: 'Electronics & Communication', capacity: 50, roomType: 'Laboratory', status: 'Active' },
-  { id: 'RM-N201', roomNumber: 'N201', roomName: 'VLSI & Embedded Systems Lab', block: 'N Block', floor: 'Second Floor', department: 'Electronics & Communication', capacity: 45, roomType: 'Laboratory', status: 'Active' },
+  { id: 'RM-N107', roomNumber: 'N107', roomName: 'Mechanical Department', block: 'N Block', floor: 'First Floor', department: 'Mechanical Engineering', capacity: 50, roomType: 'Laboratory', status: 'Active' },
+  { id: 'RM-N103', roomNumber: 'N103', roomName: 'N103 Room', block: 'N Block', floor: 'First Floor', department: 'General', capacity: 50, roomType: 'Classroom', status: 'Active' },
+  { id: 'RM-N108', roomNumber: 'N108', roomName: 'Physics Lab', block: 'N Block', floor: 'First Floor', department: 'General', capacity: 50, roomType: 'Laboratory', status: 'Active' },
 
   // M Block
   { id: 'RM-M001', roomNumber: 'M001', roomName: 'CAM & CAD Manufacturing Workshop', block: 'M Block', floor: 'Ground Floor', department: 'Mechanical Engineering', capacity: 80, roomType: 'Laboratory', status: 'Active' },

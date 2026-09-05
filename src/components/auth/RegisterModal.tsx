@@ -23,28 +23,24 @@ export const RegisterModal: React.FC = () => {
   const [email, setEmail] = useState('');
   const [mobile, setMobile] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [role, setRole] = useState<Role>('Staff');
   const [errorMsg, setErrorMsg] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (password !== confirmPassword) {
-      setErrorMsg('Passwords do not match.');
-      return;
-    }
     if (!fullName || !email || !staffId) {
       setErrorMsg('Please fill in all required fields.');
       return;
     }
 
     register({
-      fullName,
+      full_name: fullName,
       department,
-      staffId,
+      staff_id: staffId,
       email,
       mobile,
       role,
+      password,
     });
   };
 
@@ -206,39 +202,20 @@ export const RegisterModal: React.FC = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1">
-                Password *
-              </label>
-              <div className="relative">
-                <Lock className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full bg-slate-800/80 border border-slate-700 focus:border-blue-500 text-white text-xs rounded-xl pl-9 pr-3 py-2.5 outline-none"
-                  required
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1">
-                Confirm Password *
-              </label>
-              <div className="relative">
-                <Lock className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full bg-slate-800/80 border border-slate-700 focus:border-blue-500 text-white text-xs rounded-xl pl-9 pr-3 py-2.5 outline-none"
-                  required
-                />
-              </div>
+          <div>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1">
+              Password *
+            </label>
+            <div className="relative">
+              <Lock className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                className="w-full bg-slate-800/80 border border-slate-700 focus:border-blue-500 text-white text-xs rounded-xl pl-9 pr-3 py-2.5 outline-none"
+                required
+              />
             </div>
           </div>
 

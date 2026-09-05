@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AppProvider, useApp } from './context/AppContext';
+import { AppContextProvider, useAppContext } from './context/AppContext';
 import { SplashScreen } from './components/splash/SplashScreen';
 import { LandingPage } from './components/landing/LandingPage';
 import { Navbar } from './components/layout/Navbar';
@@ -28,9 +28,10 @@ import { UserManagementView } from './components/users/UserManagementView';
 import { SettingsView } from './components/settings/SettingsView';
 import { ProfileView } from './components/profile/ProfileView';
 import { HelpSupportView } from './components/help/HelpSupportView';
+import { SystemMonitorView } from './components/system-monitor/SystemMonitorView';
 
 const MainAppContent: React.FC = () => {
-  const { activeTab, setActiveTab, currentUser } = useApp();
+  const { activeTab, setActiveTab, currentUser } = useAppContext();
 
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
@@ -169,6 +170,8 @@ const MainAppContent: React.FC = () => {
           {activeTab === 'profile' && <ProfileView />}
 
           {activeTab === 'help' && <HelpSupportView />}
+
+          {activeTab === 'system-monitor' && <SystemMonitorView />}
         </main>
       </div>
 
@@ -226,8 +229,8 @@ const MainAppContent: React.FC = () => {
 
 export default function App() {
   return (
-    <AppProvider>
+    <AppContextProvider>
       <MainAppContent />
-    </AppProvider>
+    </AppContextProvider>
   );
 }

@@ -1,4 +1,4 @@
-export type Role = 'Admin' | 'Principal' | 'Dean' | 'HOD' | 'Staff' | 'Technician' | 'Monitor';
+export type Role = 'Admin' | 'Principal' | 'Dean' | 'HOD' | 'Staff' | 'Technician' | 'Monitor' | 'System Monitor';
 
 export type Department =
   | 'Computer Science & Engineering'
@@ -11,7 +11,8 @@ export type Department =
   | 'Administrative Office'
   | 'Central Library'
   | 'Hostel Management'
-  | 'Physical Education';
+  | 'Physical Education'
+  | 'General';
 
 export interface BlockItem {
   id: string;
@@ -73,7 +74,34 @@ export type CategoryType =
   | 'Library Assets'
   | 'Hostel Assets'
   | 'Electrical Equipment'
+  | 'Fans'
+  | 'LED Lights'
+  | 'Mini Notice Board'
+  | 'Dustbin'
+  | 'Student Bench'
+  | 'Open Rack'
+  | 'Closed Bureau'
+  | 'Projector Screen'
+  | 'Black Board'
+  | 'Computer Table'
+  | 'Fire Extinguisher'
+  | 'Staff Cabin Table'
+  | 'Staff Table'
+  | 'Small Bench'
+  | 'Long Bench'
+  | 'Drawer'
+  | 'First Aid Kit Box'
+  | 'White Board'
+  | 'Cupboard'
+  | 'Long Lab Switch Table'
+  | 'Lab Stool'
+  | 'Washbasin'
+  | 'Microphone Speaker'
+  | 'Camera'
+  | 'Speaker'
   | 'Other Assets';
+
+export type ChairType = 'Normal Chair' | 'Plastic Chair' | 'Cushion Chair' | 'Rolling Chair';
 
 export type AssetCondition = 'New' | 'Good' | 'Fair' | 'Poor' | 'Damaged';
 
@@ -83,17 +111,19 @@ export interface Asset {
   id: string; // e.g. "AIT-CSE-101"
   name: string;
   category: CategoryType;
+  chair_type_id?: ChairType;
   department: Department;
   building: Building;
   floor?: FloorName;
   roomNumber: string;
-  purchaseDate: string;
+  location?: string; // alias for roomNumber for compatibility
+  purchaseDate?: string;
   purchaseCost: number; // in INR ₹
   vendor: string;
   warrantyExpiry: string;
   condition: AssetCondition;
   status: AssetStatus;
-  assignedTo: string; // e.g. "Dr. R. Sundaram (HOD CSE)" or "Lab 3"
+  assignedTo?: string; // e.g. "Dr. R. Sundaram (HOD CSE)" or "Lab 3"
   assignedType: 'Faculty' | 'Department' | 'Lab' | 'Classroom' | 'Hostel' | 'Store Room';
   qrCodeUrl?: string;
   imageUrl?: string;
@@ -163,7 +193,7 @@ export interface NotificationItem {
   title: string;
   message: string;
   type: 'info' | 'warning' | 'alert' | 'success';
-  category: 'Asset Added' | 'Maintenance Due' | 'Warranty Expired' | 'QR Scan Success' | 'Low Inventory' | 'Lost Asset';
+  category: 'Asset Added' | 'Maintenance Due' | 'Warranty Expired' | 'QR Scan Success' | 'Low Inventory' | 'Lost Asset' | 'Maintenance';
   timestamp: string;
   read: boolean;
   assetId?: string;
