@@ -124,13 +124,45 @@ export const login = async (email: string, password: string, role?: string) => {
 };
 
 export const logout = async () => {
-  // Backend may not need logout; just resolve
+  try {
+    await axios.post(`${API_BASE}/auth/logout`, {}, withAuthHeaders());
+  } catch { /* ignore */ }
   return;
 };
 
 export const register = async (user: Partial<User> & { password?: string }) => {
   const { password, ...rest } = user;
-  const payload = { ...rest, password };
+  // Map frontend field names to backend expected ones
+  const payload = {
+    full_name: (rest as any).fullName,
+    staff_id: (rest as any).staffId,
+    department: rest.department,
+    role: rest.role,
+    email: rest.email,
+    password,
+  };
   const res = await axios.post(`${API_BASE}/auth/register`, payload);
   return res.data; // { token, user }
+};
+
+
+// ---------- ADMIN USER MANAGEMENT ----------
+export const createUser = async (data: { email: string; password: string; name: string; role: string; department?: string; staffId?: string }) => {
+  const res = await axios.post(`${API_BASE}/users`, data, withAuthHeaders());
+  return res.data;
+};
+
+export const updateUser = async (id: string, updates: Record<string, any>) => {
+  const res = await axios.patch(`${API_BASE}/users/${id}`, updates, withAuthHeaders());
+  return res.data;
+};
+
+export const fetchLoginHistory = async () => {
+  const res = await axios.get(`${API_BASE}/auth/login-history`, withAuthHeaders());
+  return res.data;
+};
+
+export const fetchAuditLogsApi = async () => {
+  const res = await axios.get(`${API_BASE}/auth/audit-logs`, withAuthHeaders());
+  return res.data;
 };

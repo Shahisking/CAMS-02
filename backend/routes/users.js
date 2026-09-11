@@ -16,6 +16,19 @@ const mapUser = r => ({
   status: r.status || 'Active', lastLogin: r.last_login || ''
 });
 
+// Helper: insert audit log row
+async function insertAuditLog(pool, { userId, userEmail, role, department, action, details, ipAddress }) {
+  try {
+    await pool.query(
+      `INSERT INTO audit_logs (user_id, user_email, role, department, action, details, ip_address, timestamp)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())`,
+      [userId || null, userEmail || '', role || '', department || '', action, details || '', ipAddress || '']
+    );
+  } catch (err) {
+    console.error('Failed to insert audit log:', err.message);
+  }
+}
+
 router.get('/', verifyToken, async (req, res) => {
   try {
     const { rows } = await getDB().query('SELECT * FROM users');
@@ -36,7 +49,7 @@ router.get('/:id', verifyToken, async (req, res) => {
   }
 });
 
-router.post('/', verifyToken, requireRole(['Monitor']), async (req, res) => {
+router.post('/', verifyToken, requireRole(['Monitor', 'Admin']), async (req, res) => {
   const { email, password, name, role, department, staffId } = req.body;
   if (!email || !password || !role)
     return res.status(400).json({ message: 'Email, password and role are required' });
@@ -51,6 +64,14 @@ router.post('/', verifyToken, requireRole(['Monitor']), async (req, res) => {
       'INSERT INTO users (email, password_hash, name, role, department, staff_id, status) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
       [email, hash, name || null, role, department || null, staffId || null, 'Active']
     );
+
+    // Audit log: USER_REGISTERED (admin-created)
+    await insertAuditLog(getDB(), {
+      userId: rows[0].id, userEmail: rows[0].email, role: req.user.role, department: req.user.department || '',
+      action: 'USER_REGISTERED', details: `Admin ${req.user.email} registered new user: ${rows[0].name} (${rows[0].email}) as ${role}`,
+      ipAddress: req.ip,
+    });
+
     res.status(201).json(mapUser(rows[0]));
   } catch (err) {
     console.error('Create user error:', err);
@@ -58,21 +79,30 @@ router.post('/', verifyToken, requireRole(['Monitor']), async (req, res) => {
   }
 });
 
-router.patch('/:id', verifyToken, requireRole(['Monitor']), async (req, res) => {
-  const { name, department, mobile, avatar, status } = req.body;
+router.patch('/:id', verifyToken, requireRole(['Monitor', 'Admin']), async (req, res) => {
+  const { name, department, avatar, status, role } = req.body;
   try {
     const fields = [], values = [];
     let index = 1;
     if (name !== undefined) { fields.push(`name = $${index++}`); values.push(name); }
     if (department !== undefined) { fields.push(`department = $${index++}`); values.push(department); }
-    if (mobile !== undefined) { fields.push(`mobile = $${index++}`); values.push(mobile); }
     if (avatar !== undefined) { fields.push(`avatar = $${index++}`); values.push(avatar); }
     if (status !== undefined) { fields.push(`status = $${index++}`); values.push(status); }
+    if (role !== undefined) { fields.push(`role = $${index++}`); values.push(role); }
     
     if (!fields.length) return res.status(400).json({ message: 'No fields to update' });
     
     values.push(req.params.id);
     await getDB().query(`UPDATE users SET ${fields.join(', ')} WHERE id = $${index}`, values);
+
+    // Audit log: USER_UPDATED
+    const updatedFields = Object.keys(req.body).filter(k => req.body[k] !== undefined).join(', ');
+    await insertAuditLog(getDB(), {
+      userId: req.params.id, userEmail: req.user.email, role: req.user.role, department: req.user.department || '',
+      action: 'USER_UPDATED', details: `User #${req.params.id} updated: ${updatedFields}`,
+      ipAddress: req.ip,
+    });
+
     res.json({ message: 'User updated' });
   } catch (err) {
     console.error(err);

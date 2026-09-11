@@ -4,12 +4,13 @@ import {
   ShieldCheck,
   User as UserIcon,
   Mail,
-  Phone,
   Building,
   Lock,
   ArrowRight,
   X,
   CreditCard,
+  CheckCircle2,
+  Loader2,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { Department, Role } from '../../types';
@@ -21,28 +22,49 @@ export const RegisterModal: React.FC = () => {
   const [department, setDepartment] = useState<Department>('Computer Science & Engineering');
   const [staffId, setStaffId] = useState('');
   const [email, setEmail] = useState('');
-  const [mobile, setMobile] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState<Role>('Staff');
   const [errorMsg, setErrorMsg] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!fullName || !email || !staffId) {
+    setErrorMsg('');
+    setSuccessMsg('');
+    if (!fullName || !email || !staffId || !password) {
       setErrorMsg('Please fill in all required fields.');
       return;
     }
-
-    register({
-      fullName,
-      department,
-      staffId,
-      email,
-      mobile,
-      role,
-      password,
-    });
+    if (password.length < 6) {
+      setErrorMsg('Password must be at least 6 characters.');
+      return;
+    }
+    setIsLoading(true);
+    try {
+      await register({
+        fullName,
+        department,
+        staffId,
+        email,
+        role,
+        password,
+      });
+      setSuccessMsg('Registration successful! Redirecting to login...');
+      setTimeout(() => {
+        setActiveTab('login');
+      }, 1800);
+    } catch (err: any) {
+      const msg =
+        err?.response?.data?.message ||
+        err?.message ||
+        'Registration failed. Please try again.';
+      setErrorMsg(msg);
+    } finally {
+      setIsLoading(false);
+    }
   };
+
 
   return (
     <div className="min-h-screen bg-slate-900 text-white flex items-center justify-center p-4 relative overflow-hidden py-12">
@@ -84,6 +106,13 @@ export const RegisterModal: React.FC = () => {
         {errorMsg && (
           <div className="mb-4 p-3 bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs rounded-xl">
             {errorMsg}
+          </div>
+        )}
+
+        {successMsg && (
+          <div className="mb-4 p-3 bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs rounded-xl flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 shrink-0" />
+            {successMsg}
           </div>
         )}
 
@@ -184,22 +213,6 @@ export const RegisterModal: React.FC = () => {
                 />
               </div>
             </div>
-
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1">
-                Mobile Number
-              </label>
-              <div className="relative">
-                <Phone className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input
-                  type="tel"
-                  value={mobile}
-                  onChange={(e) => setMobile(e.target.value)}
-                  placeholder="+91 98765 43210"
-                  className="w-full bg-slate-800/80 border border-slate-700 focus:border-blue-500 text-white text-xs rounded-xl pl-9 pr-3 py-2.5 outline-none"
-                />
-              </div>
-            </div>
           </div>
 
           <div>
@@ -221,9 +234,19 @@ export const RegisterModal: React.FC = () => {
 
           <button
             type="submit"
-            className="w-full py-3.5 bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-500 hover:to-emerald-500 text-white font-semibold rounded-xl text-sm shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2 transition-all mt-4"
+            disabled={isLoading}
+            className="w-full py-3.5 bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-500 hover:to-emerald-500 text-white font-semibold rounded-xl text-sm shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2 transition-all mt-4 disabled:opacity-60 disabled:pointer-events-none"
           >
-            Complete Registration <ArrowRight className="w-4 h-4" />
+            {isLoading ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Registering...
+              </>
+            ) : (
+              <>
+                Complete Registration <ArrowRight className="w-4 h-4" />
+              </>
+            )}
           </button>
         </form>
 

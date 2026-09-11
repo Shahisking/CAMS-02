@@ -8,46 +8,55 @@ import {
   Trash2,
   Edit,
   Mail,
-  Phone,
   Building,
   Activity,
   CheckCircle2,
   X,
+  Lock,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { Department, Role, User } from '../../types';
+import { createUser } from '../../api';
 
 export const UserManagementView: React.FC = () => {
-  const { users, addUser, updateUser, deleteUser, currentUser, failedAttemptsMap, unlockAccount } = useApp();
-  const isMonitor = currentUser?.role === 'Monitor';
+  const { users, updateUser, deleteUser, currentUser, failedAttemptsMap, unlockAccount } = useApp();
+  const isMonitor = currentUser?.role === 'Monitor' || currentUser?.role === 'Admin';
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [department, setDepartment] = useState<Department>('Computer Science & Engineering');
   const [staffId, setStaffId] = useState('');
-  const [mobile, setMobile] = useState('');
+  const [password, setPassword] = useState('');
   const [role, setRole] = useState<Role>('Staff');
+  const [addUserError, setAddUserError] = useState('');
+  const [addUserLoading, setAddUserLoading] = useState(false);
 
   const [resetSuccessId, setResetSuccessId] = useState<string | null>(null);
 
-  const handleAddUserSubmit = (e: React.FormEvent) => {
+  const handleAddUserSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!fullName || !email) return;
-
-    addUser({
-      fullName,
-      email,
-      department,
-      staffId: staffId || `AIT-EMP-${Math.floor(1000 + Math.random() * 9000)}`,
-      mobile: mobile || '+91 98765 43210',
-      role,
-      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=250&q=80',
-      status: 'Active',
-      lastLogin: 'Never',
-    });
-
-    setShowAddModal(false);
+    if (!fullName || !email || !password) return;
+    setAddUserError('');
+    setAddUserLoading(true);
+    try {
+      await createUser({
+        email,
+        password,
+        name: fullName,
+        role,
+        department,
+        staffId: staffId || undefined,
+      });
+      // Refresh users by reloading the page data
+      window.location.reload();
+      setShowAddModal(false);
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || 'Failed to create user';
+      setAddUserError(msg);
+    } finally {
+      setAddUserLoading(false);
+    }
   };
 
   const handleResetPassword = (id: string) => {
@@ -139,7 +148,7 @@ export const UserManagementView: React.FC = () => {
                   <td className="py-3.5 px-4">
                     {(failedAttemptsMap[u.email.toLowerCase()] || 0) >= 5 ? (
                       <span className="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300">
-                        🔒 Locked (5 Failed)
+                        Locked (5 Failed)
                       </span>
                     ) : isMonitor ? (
                       <span
@@ -154,7 +163,7 @@ export const UserManagementView: React.FC = () => {
                             : 'bg-slate-200 text-slate-600'
                         }`}
                       >
-                        ● {u.status}
+                        {u.status}
                       </span>
                     ) : (
                       <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
@@ -162,7 +171,7 @@ export const UserManagementView: React.FC = () => {
                           ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
                           : 'bg-slate-200 text-slate-600'
                       }`}>
-                        ● {u.status}
+                        {u.status}
                       </span>
                     )}
                   </td>
@@ -226,6 +235,12 @@ export const UserManagementView: React.FC = () => {
             <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-1">Add System User</h3>
             <p className="text-xs text-slate-500 mb-6">Create new institutional staff account</p>
 
+            {addUserError && (
+              <div className="mb-4 p-3 bg-rose-50 border border-rose-200 text-rose-600 text-xs font-medium rounded-xl">
+                {addUserError}
+              </div>
+            )}
+
             <form onSubmit={handleAddUserSubmit} className="space-y-4 text-xs">
               <div>
                 <label className="block font-bold uppercase text-slate-700 dark:text-slate-300 mb-1">
@@ -270,6 +285,24 @@ export const UserManagementView: React.FC = () => {
                 </div>
               </div>
 
+              <div>
+                <label className="block font-bold uppercase text-slate-700 dark:text-slate-300 mb-1">
+                  Password *
+                </label>
+                <div className="relative">
+                  <Lock className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Minimum 6 characters"
+                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl pl-9 pr-3 py-2.5 outline-none"
+                    required
+                    minLength={6}
+                  />
+                </div>
+              </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block font-bold uppercase text-slate-700 dark:text-slate-300 mb-1">
@@ -285,6 +318,7 @@ export const UserManagementView: React.FC = () => {
                     <option value="Electronics & Communication">ECE Dept</option>
                     <option value="Mechanical Engineering">Mech Dept</option>
                     <option value="Civil Engineering">Civil Dept</option>
+                    <option value="Administrative Office">Admin Office</option>
                   </select>
                 </div>
 
@@ -308,9 +342,10 @@ export const UserManagementView: React.FC = () => {
 
               <button
                 type="submit"
-                className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-xs shadow-md shadow-blue-500/20 transition-all mt-2"
+                disabled={addUserLoading}
+                className="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-semibold rounded-xl text-xs shadow-md shadow-blue-500/20 transition-all mt-2"
               >
-                Create User
+                {addUserLoading ? 'Creating...' : 'Create User'}
               </button>
             </form>
           </motion.div>

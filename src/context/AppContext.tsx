@@ -52,6 +52,8 @@ import {
   login as apiLogin,
   logout as apiLogout,
   register as apiRegister,
+  createUser as apiCreateUser,
+  updateUser as apiUpdateUser,
 } from '../api';
 
 export type ActiveTab =
@@ -343,22 +345,10 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   };
 
   const register = async (user: Partial<User> & { password?: string }) => {
-    try {
-      const { token, user: newUser } = await apiRegister(user);
-      const mappedUser = {
-        ...newUser,
-        fullName: newUser.full_name || newUser.fullName || newUser.name || '',
-        staffId: newUser.staff_id || newUser.staffId || '',
-      };
-      localStorage.setItem('cams_jwt', token);
-      localStorage.setItem('cams_current_user', JSON.stringify(mappedUser));
-      setCurrentUser(mappedUser);
-      setActiveTabState('dashboard');
-      return true;
-    } catch (e) {
-      console.error('Register error', e);
-      return false;
-    }
+    const result = await apiRegister(user);
+    // Backend register does not return a token — redirect to login
+    setActiveTabState('login');
+    return true;
   };
 
   // Asset CRUD
@@ -494,11 +484,41 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     auditLogs,
     users,
     addUser: async (user) => {
-      const newUser = { ...user, id: `user-${Date.now()}` } as User;
-      setUsers(p => [newUser, ...p]);
+      try {
+        const created = await apiCreateUser({
+          email: user.email,
+          password: (user as any).password || 'Temp@123',
+          name: user.fullName,
+          role: user.role,
+          department: user.department,
+          staffId: user.staffId,
+        });
+        const mapped = {
+          id: String(created.id),
+          fullName: created.fullName || created.name || '',
+          email: created.email,
+          department: created.department || 'Administrative Office',
+          staffId: created.staffId || '',
+          mobile: created.mobile || '',
+          role: created.role || 'Staff',
+          avatar: created.avatar || '',
+          status: created.status || 'Active',
+          lastLogin: created.lastLogin || '',
+        } as User;
+        setUsers(p => [mapped, ...p]);
+      } catch (err) {
+        console.error('addUser API error:', err);
+        throw err;
+      }
     },
-    updateUser: (id, upd) => {
-      setUsers(p => p.map(u => u.id === id ? { ...u, ...upd } : u));
+    updateUser: async (id, upd) => {
+      try {
+        await apiUpdateUser(id, upd);
+        setUsers(p => p.map(u => (u.id === id ? { ...u, ...upd } : u)));
+      } catch (err) {
+        console.error('updateUser API error:', err);
+        throw err;
+      }
     },
     deleteUser: (id) => setUsers(p => p.filter(u => u.id !== id)),
     failedAttemptsMap,
