@@ -5,22 +5,27 @@
 @layer base {
   :root {
     --font-sans: 'Inter', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-    --font-display: 'Inter', 'Space Grotesk', system-ui, sans-serif;
+    --font-display: 'Plus Jakarta Sans', 'Space Grotesk', system-ui, sans-serif;
+    --primary-blue: #2563EB;
+    --primary-blue-hover: #1D4ED8;
+    --primary-blue-dark: #1E40AF;
   }
 
   body {
     font-family: var(--font-sans);
     letter-spacing: -0.01em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
-    letter-spacing: -0.03em;
+    letter-spacing: -0.025em;
   }
 }
 
 .font-display {
-  font-family: 'Space Grotesk', 'Syne', system-ui, sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Space Grotesk', system-ui, sans-serif;
 }
 
 .font-syne {
@@ -29,22 +34,22 @@
 
 /* Bold Typography Utility Classes */
 .heading-hero {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-weight: 800;
   letter-spacing: -0.04em;
-  line-height: 1.05;
+  line-height: 1.1;
 }
 
 .heading-section {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-weight: 700;
   letter-spacing: -0.03em;
 }
 
 .stat-value {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-weight: 800;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.03em;
 }
 
 .badge-bold {
@@ -54,21 +59,50 @@
   font-size: 0.6875rem;
 }
 
+/* ERP Card Styles */
+.erp-card {
+  background-color: #ffffff;
+  border: 1px solid #E2E8F0;
+  border-radius: 1rem;
+  box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.03), 0 1px 2px -1px rgba(15, 23, 42, 0.03);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dark .erp-card {
+  background-color: #0F172A;
+  border-color: #1E293B;
+  box-shadow: none;
+}
+
+.erp-card-hover {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.erp-card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.08), 0 8px 10px -6px rgba(37, 99, 235, 0.04);
+}
+.dark .erp-card-hover:hover {
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+  border-color: #334155;
+}
+
 /* Glassmorphism & High-Contrast Cards */
 .glass-panel {
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
 
 .dark .glass-panel {
-  background: rgba(15, 23, 42, 0.9);
-  backdrop-filter: blur(12px);
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
 
 /* Smooth Scrollbars */
 ::-webkit-scrollbar {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -84,7 +118,7 @@
   background: rgba(148, 163, 184, 0.55);
 }
 
-/* Remove default browser number input spin buttons (up/down arrow buttons) */
+/* Remove default browser number input spin buttons */
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-clear-button {
@@ -99,4 +133,27 @@ input[type="number"] {
   -webkit-appearance: textfield !important;
   -moz-appearance: textfield !important;
   appearance: textfield !important;
+}
+
+/* Custom Status Dot Pulse */
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-dot-active {
+  background-color: #10B981;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+}
+
+.status-dot-warning {
+  background-color: #F59E0B;
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+}
+
+.status-dot-danger {
+  background-color: #EF4444;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
 }

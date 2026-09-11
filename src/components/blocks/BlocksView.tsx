@@ -128,6 +128,7 @@ export const BlocksView: React.FC = () => {
     'Central Library',
     'Hostel Management',
     'Physical Education',
+    'General',
   ];
 
   // Helper stats calculation
@@ -591,8 +592,8 @@ export const BlocksView: React.FC = () => {
                     <h4 className="text-sm font-bold text-slate-900 dark:text-white mt-2 line-clamp-2 pr-4">
                       {asset.name}
                     </h4>
-                    <p className="text-[11px] font-semibold text-[#2563EB] mt-0.5">
-                      Quantity: {asset.count} Unit{asset.count > 1 ? 's' : ''}
+                    <p className="text-[11px] font-mono font-semibold text-[#2563EB] mt-0.5">
+                      Asset ID: {asset.id}
                     </p>
 
                     <div className="mt-2.5 pt-2.5 border-t border-slate-100 dark:border-slate-800/80 text-xs text-slate-500 dark:text-slate-400 space-y-1">
@@ -892,20 +893,31 @@ export const BlocksView: React.FC = () => {
                             </div>
 
                             {/* Card Footer Button */}
-                            <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                            <div className="pt-2.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
                               <span
-                                className={`text-[11px] font-bold ${
+                                className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold ${
                                   room.status === 'Active' || room.status === 'Occupied'
-                                    ? 'text-emerald-600 dark:text-emerald-400'
-                                    : 'text-amber-600 dark:text-amber-400'
+                                    ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border border-emerald-200/80 dark:border-emerald-900/50'
+                                    : room.status === 'Under Maintenance' || room.status === 'Under Renovation'
+                                    ? 'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400 border border-amber-200/80 dark:border-amber-900/50'
+                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700'
                                 }`}
                               >
-                                ● {room.status}
+                                <span
+                                  className={`w-2 h-2 rounded-full ${
+                                    room.status === 'Active' || room.status === 'Occupied'
+                                      ? 'bg-emerald-500 animate-pulse'
+                                      : room.status === 'Under Maintenance' || room.status === 'Under Renovation'
+                                      ? 'bg-amber-500'
+                                      : 'bg-slate-400'
+                                  }`}
+                                />
+                                <span>{room.status}</span>
                               </span>
 
                               <button
                                 onClick={() => handleSelectRoom(room.roomNumber)}
-                                className="px-3 py-1.5 bg-[#2563EB] hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs flex items-center gap-1 transition-all cursor-pointer"
+                                className="px-3.5 py-1.5 bg-[#2563EB] hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs shadow-blue-500/20 flex items-center gap-1 transition-all cursor-pointer hover:translate-x-0.5"
                               >
                                 <span>View Assets</span>
                                 <ChevronRight className="w-3.5 h-3.5" />

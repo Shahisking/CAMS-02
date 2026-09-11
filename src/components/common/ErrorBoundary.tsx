@@ -17,7 +17,6 @@ export class ErrorBoundary extends Component<Props, State> {
   };
 
   public static getDerivedStateFromError(error: Error): State {
-    // Update state so the next render will show the fallback UI.
     return { hasError: true, error };
   }
 
@@ -26,7 +25,7 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   private handleReset = () => {
-    this.setState({ hasError: false, error: null });
+    (this as any).setState({ hasError: false, error: null });
     window.location.reload();
   };
 
@@ -51,7 +50,7 @@ export class ErrorBoundary extends Component<Props, State> {
             )}
             <button
               onClick={this.handleReset}
-              className="mt-4 px-6 py-2.5 bg-[#2563EB] hover:bg-blue-700 text-white font-bold rounded-xl flex items-center justify-center gap-2 w-full transition-colors"
+              className="mt-4 px-6 py-2.5 bg-[#2563EB] hover:bg-blue-700 text-white font-bold rounded-xl flex items-center justify-center gap-2 w-full transition-colors cursor-pointer"
             >
               <RefreshCcw className="w-4 h-4" />
               Reload Application
@@ -61,6 +60,6 @@ export class ErrorBoundary extends Component<Props, State> {
       );
     }
 
-    return this.props.children;
+    return (this as any).props.children;
   }
 }

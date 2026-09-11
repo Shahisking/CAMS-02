@@ -24,6 +24,7 @@ const DEPARTMENTS: Department[] = [
   'Central Library',
   'Hostel Management',
   'Physical Education',
+  'General',
 ];
 
 const ROOM_TYPES: RoomType[] = [
@@ -34,6 +35,7 @@ const ROOM_TYPES: RoomType[] = [
   'Office',
   'Store Room',
   'Server Room',
+  'Library',
 ];
 
 const ROOM_STATUSES: RoomStatus[] = [

@@ -24,6 +24,8 @@ async function initDb() {
       DROP TABLE IF EXISTS maintenance CASCADE;
       DROP TABLE IF EXISTS asset_history CASCADE;
       DROP TABLE IF EXISTS allocations CASCADE;
+      DROP TABLE IF EXISTS asset_requests CASCADE;
+      DROP TABLE IF EXISTS rooms CASCADE;
       DROP TABLE IF EXISTS assets CASCADE;
       DROP TABLE IF EXISTS vendors CASCADE;
       DROP TABLE IF EXISTS blocks CASCADE;

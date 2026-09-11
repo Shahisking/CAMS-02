@@ -215,7 +215,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     return uniqueBuildings.map((b) => ({
       id: `blk-${b}`,
       name: b,
-      code: b!.substring(0, 3).toUpperCase(),
+      code: typeof b === 'string' ? b.substring(0, 3).toUpperCase() : 'BLK',
       description: `${b} Building`,
       lastUpdated: new Date().toISOString(),
     } as BlockItem));
@@ -232,8 +232,10 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
           id: `rm-${key}`,
           block: a.building,
           roomNumber: a.roomNumber,
+          roomName: `Room ${a.roomNumber}`,
+          floor: 'First Floor',
           department: a.department || 'General',
-          type: 'Classroom',
+          roomType: 'Classroom',
           capacity: 60,
           status: 'Occupied',
         });

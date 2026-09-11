@@ -4,8 +4,9 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "frontend": "vite --port=3001 --host=0.0.0.0",
+    "frontend": "vite --port=3000 --host=0.0.0.0",
     "backend": "npm --prefix backend run dev",
+    "start": "concurrently \"npm run frontend\" \"npm run backend\"",
     "dev": "concurrently \"npm run frontend\" \"npm run backend\"",
     "server": "node backend/server.js",
     "build": "vite build",

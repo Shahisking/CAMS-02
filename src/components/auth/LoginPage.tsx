@@ -30,7 +30,7 @@ interface LoginPageProps {
 export const LoginPage: React.FC<LoginPageProps> = ({ onClose, isModal = false }) => {
   const { login, isDarkMode, toggleDarkMode, setActiveTab } = useApp();
 
-  const [role, setRole] = useState<Role>('Principal');
+  const [role, setRole] = useState<Role>('Admin');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);

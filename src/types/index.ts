@@ -31,7 +31,8 @@ export type RoomType =
   | 'Seminar Hall'
   | 'Office'
   | 'Store Room'
-  | 'Server Room';
+  | 'Server Room'
+  | 'Library';
 
 export type RoomStatus = 'Active' | 'Occupied' | 'Vacant' | 'Under Maintenance' | 'Under Renovation';
 

@@ -7,13 +7,13 @@ require('dotenv').config({ path: require('path').join(__dirname, '../.env') });
 const BASE_URL = `http://localhost:${process.env.PORT || 5000}`;
 
 const accounts = [
-  { email: 'admin@ait.edu.in',     password: 'Admin@123',     role: 'Administrator' },
-  { email: 'principal@ait.edu.in', password: 'Principal@123', role: 'Principal'     },
-  { email: 'dean@ait.edu.in',      password: 'Dean@123',      role: 'Dean'          },
-  { email: 'hod@ait.edu.in',       password: 'Hod@123',       role: 'HOD'           },
-  { email: 'staff@ait.edu.in',     password: 'Staff@123',     role: 'Staff'         },
-  { email: 'labtech@ait.edu.in',   password: 'LabTech@123',   role: 'LabTechnician' },
-  { email: 'monitor@ait.edu.in',   password: 'Monitor@123',   role: 'Monitor'       }
+  { email: 'admin@ait.edu.in',      password: 'Admin@123',      role: 'Admin'      },
+  { email: 'principal@ait.edu.in',  password: 'Principal@123',  role: 'Principal'  },
+  { email: 'dean@ait.edu.in',       password: 'Dean@123',       role: 'Dean'       },
+  { email: 'hod@ait.edu.in',        password: 'Hod@123',        role: 'HOD'        },
+  { email: 'staff@ait.edu.in',      password: 'Staff@123',      role: 'Staff'      },
+  { email: 'technician@ait.edu.in', password: 'Technician@123', role: 'Technician' },
+  { email: 'monitor@ait.edu.in',    password: 'Monitor@123',    role: 'Monitor'    }
 ];
 
 async function verifyLogin() {

@@ -4,11 +4,26 @@ const { getDB } = require('../config/db');
 const { verifyToken, requireRole } = require('../middleware/authMiddleware');
 const router = express.Router();
 
+function mapRow(r) {
+  return {
+    id: String(r.id),
+    roomNumber: r.room_number,
+    roomName: r.room_name,
+    block: r.block,
+    floor: r.floor,
+    department: r.department || 'General',
+    capacity: r.capacity ? Number(r.capacity) : 0,
+    roomType: r.room_type,
+    status: r.status,
+    description: r.description,
+  };
+}
+
 // GET all rooms
 router.get('/', verifyToken, async (req, res) => {
   try {
     const { rows } = await getDB().query('SELECT * FROM rooms ORDER BY block, floor, room_number');
-    res.json(rows);
+    res.json(rows.map(mapRow));
   } catch (err) {
     console.error('Error fetching rooms:', err);
     res.status(500).json({ message: 'Server error fetching rooms' });
@@ -22,7 +37,7 @@ router.get('/block/:block', verifyToken, async (req, res) => {
       'SELECT * FROM rooms WHERE block = $1 ORDER BY floor, room_number',
       [req.params.block]
     );
-    res.json(rows);
+    res.json(rows.map(mapRow));
   } catch (err) {
     console.error('Error fetching rooms by block:', err);
     res.status(500).json({ message: 'Server error fetching rooms' });
@@ -31,7 +46,16 @@ router.get('/block/:block', verifyToken, async (req, res) => {
 
 // POST create room (Monitor only)
 router.post('/', verifyToken, requireRole(['Monitor']), async (req, res) => {
-  const { room_number, room_name, block, floor, department, room_type, capacity, status, description } = req.body;
+  const b = req.body;
+  const room_number = b.room_number || b.roomNumber;
+  const room_name = b.room_name || b.roomName;
+  const block = b.block;
+  const floor = b.floor;
+  const department = b.department;
+  const room_type = b.room_type || b.roomType;
+  const capacity = b.capacity;
+  const status = b.status;
+  const description = b.description;
   if (!room_number || !block || !floor) {
     return res.status(400).json({ message: 'room_number, block, and floor are required' });
   }
@@ -42,7 +66,7 @@ router.post('/', verifyToken, requireRole(['Monitor']), async (req, res) => {
        RETURNING *`,
       [room_number, room_name || room_number, block, floor, department || null, room_type || 'Classroom', capacity || 0, status || 'Active', description || null]
     );
-    res.status(201).json(rows[0]);
+    res.status(201).json(mapRow(rows[0]));
   } catch (err) {
     console.error('Error creating room:', err);
     if (err.code === '23505') {
@@ -57,8 +81,11 @@ router.put('/:id', verifyToken, requireRole(['Monitor']), async (req, res) => {
   const { id } = req.params;
   const updates = req.body;
   const fieldMapping = {
-    room_number: 'room_number', room_name: 'room_name', block: 'block',
-    floor: 'floor', department: 'department', room_type: 'room_type',
+    room_number: 'room_number', roomNumber: 'room_number',
+    room_name: 'room_name', roomName: 'room_name',
+    block: 'block',
+    floor: 'floor', department: 'department',
+    room_type: 'room_type', roomType: 'room_type',
     capacity: 'capacity', status: 'status', description: 'description'
   };
   const fields = [], values = [];

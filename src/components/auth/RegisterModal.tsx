@@ -34,9 +34,9 @@ export const RegisterModal: React.FC = () => {
     }
 
     register({
-      full_name: fullName,
+      fullName,
       department,
-      staff_id: staffId,
+      staffId,
       email,
       mobile,
       role,

@@ -219,7 +219,7 @@ export const SystemMonitorView: React.FC = () => {
       timestamp: new Date().toISOString(),
     });
   }
-  const unreadNotifs = notifications.filter((n) => !n.isRead).length;
+  const unreadNotifs = notifications.filter((n) => !n.read).length;
   if (unreadNotifs > 0) {
     alerts.push({
       id: 'unread-notifs',
@@ -229,12 +229,12 @@ export const SystemMonitorView: React.FC = () => {
       timestamp: new Date().toISOString(),
     });
   }
-  const failedLoginUsers = users.filter((u) => u.status === 'Locked' || u.status === 'Disabled');
+  const failedLoginUsers = users.filter((u) => u.status === 'Inactive');
   if (failedLoginUsers.length > 0) {
     alerts.push({
       id: 'locked-users',
       level: 'critical',
-      message: `${failedLoginUsers.length} user account(s) locked or disabled`,
+      message: `${failedLoginUsers.length} user account(s) inactive`,
       module: 'Users',
       timestamp: new Date().toISOString(),
     });
@@ -243,11 +243,11 @@ export const SystemMonitorView: React.FC = () => {
   // Recent System Activity from audit logs + history events
   const recentActivity = [
     ...auditLogs.slice(0, 10).map((log) => ({
-      timestamp: log.timestamp || log.createdAt || new Date().toISOString(),
+      timestamp: log.timestamp || (log as any).createdAt || new Date().toISOString(),
       user: log.user || log.userEmail || 'System',
       action: log.action,
-      module: log.module || 'General',
-      status: log.status || 'Success',
+      module: (log as any).module || 'General',
+      status: (log as any).status || 'Success',
     })),
     ...historyEvents.slice(0, 5).map((ev) => ({
       timestamp: ev.date,
