@@ -121,11 +121,15 @@ export const AssetManagementView: React.FC<AssetManagementViewProps> = ({
 
   // Filter logic on live DB records
   const filteredAssets = assets.filter((a) => {
+    const q = searchQuery.toLowerCase();
     const matchesSearch =
-      a.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      a.building.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      a.department.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      a.roomNumber.toLowerCase().includes(searchQuery.toLowerCase());
+      a.name.toLowerCase().includes(q) ||
+      a.id.toLowerCase().includes(q) ||
+      a.category.toLowerCase().includes(q) ||
+      a.department.toLowerCase().includes(q) ||
+      a.building.toLowerCase().includes(q) ||
+      a.roomNumber.toLowerCase().includes(q) ||
+      (a.assignedTo && a.assignedTo.toLowerCase().includes(q));
 
     const matchesDept = departmentFilter === 'All' || a.department === departmentFilter;
     const matchesCond = conditionFilter === 'All' || a.condition === conditionFilter;
@@ -275,9 +279,18 @@ export const AssetManagementView: React.FC<AssetManagementViewProps> = ({
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search ID, name, location..."
-              className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-900 dark:text-white outline-none"
+              placeholder="Search by name, ID, department..."
+              className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl pl-9 pr-9 py-2 text-xs text-slate-900 dark:text-white outline-none"
             />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all"
+                title="Clear Search"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
 
           {/* Building Block Filter */}
@@ -432,7 +445,7 @@ export const AssetManagementView: React.FC<AssetManagementViewProps> = ({
                       <div className="truncate">
                         <div>{asset.name}</div>
                         <div className="text-[10px] text-slate-400 font-normal">
-                          ₹{asset.purchaseCost?.toLocaleString()}
+                          {asset.category}
                         </div>
                       </div>
                     </td>

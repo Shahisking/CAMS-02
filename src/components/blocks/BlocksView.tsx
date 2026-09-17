@@ -143,8 +143,6 @@ export const BlocksView: React.FC = () => {
     const maintenanceAssets = blockAssets.filter(
       (a) => a.status === 'Under Maintenance' || a.status === 'Damaged'
     ).length;
-    const totalValue = blockAssets.reduce((acc, a) => acc + (a.purchaseCost || 0), 0);
-
     const depts = Array.from(
       new Set([
         ...blockRooms.map((r) => r.department),
@@ -152,7 +150,7 @@ export const BlocksView: React.FC = () => {
       ])
     );
 
-    return { totalRooms, occupiedRooms, totalAssets, activeAssets, maintenanceAssets, depts, totalValue };
+    return { totalRooms, occupiedRooms, totalAssets, activeAssets, maintenanceAssets, depts };
   };
 
   const getRoomStats = (roomNumberStr: string, blockNameStr?: string) => {
@@ -169,9 +167,7 @@ export const BlocksView: React.FC = () => {
     const maintenanceAssets = roomAssets.filter(
       (a) => a.status === 'Under Maintenance' || a.status === 'Damaged'
     ).length;
-    const totalValue = roomAssets.reduce((acc, a) => acc + (a.purchaseCost || 0), 0);
-
-    return { totalAssets, workingAssets, maintenanceAssets, roomAssets, totalValue };
+    return { totalAssets, workingAssets, maintenanceAssets, roomAssets };
   };
 
   // Block handlers
@@ -503,9 +499,9 @@ export const BlocksView: React.FC = () => {
                   <ShieldCheck className="w-5 h-5" />
                 </div>
                 <div>
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Est. Value (₹)</div>
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Departments</div>
                   <div className="text-sm font-black text-slate-900 dark:text-white">
-                    ₹{roomAssets.reduce((acc, a) => acc + (a.purchaseCost || 0), 0).toLocaleString()}
+                    {new Set(roomAssets.map((a) => a.department)).size}
                   </div>
                 </div>
               </div>
@@ -602,15 +598,6 @@ export const BlocksView: React.FC = () => {
                         <span className="font-semibold text-slate-700 dark:text-slate-200 truncate max-w-[150px]">
                           {asset.assignedTo || 'Unassigned'}
                         </span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-slate-400">Total Value:</span>
-                        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl">
-                          <Tag className="w-3.5 h-3.5 text-slate-400" />
-                          <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300">
-                            ₹{(asset.purchaseCost || 0).toLocaleString()}
-                          </span>
-                        </div>
                       </div>
                       {asset.specifications && (
                         <div className="text-[11px] text-slate-400 line-clamp-1 italic mt-1">
@@ -884,9 +871,9 @@ export const BlocksView: React.FC = () => {
                                   </div>
                                 </div>
                                 <div>
-                                  <div className="text-[10px] uppercase font-bold text-blue-500">Value (₹)</div>
-                                  <div className="text-sm font-black text-[#2563EB] dark:text-blue-400 line-clamp-1" title={`₹${rStats.totalValue.toLocaleString()}`}>
-                                    {rStats.totalValue > 1000 ? `${(rStats.totalValue / 1000).toFixed(1)}k` : rStats.totalValue}
+                                  <div className="text-[10px] uppercase font-bold text-purple-500">Depts</div>
+                                  <div className="text-sm font-black text-purple-600 dark:text-purple-400 line-clamp-1">
+                                    {new Set(roomAssets.filter((a) => a.roomNumber === room.roomNumber && a.building === room.block).map((a) => a.department)).size}
                                   </div>
                                 </div>
                               </div>
@@ -1089,9 +1076,9 @@ export const BlocksView: React.FC = () => {
                         </div>
                       </div>
                       <div className="p-2 bg-white dark:bg-slate-800 rounded-lg shadow-2xs">
-                        <div className="text-[10px] font-bold uppercase text-emerald-500">Total Value (₹)</div>
+                        <div className="text-[10px] font-bold uppercase text-emerald-500">Active</div>
                         <div className="text-sm font-black text-emerald-600 dark:text-emerald-400 mt-0.5">
-                          {stats.totalValue.toLocaleString()}
+                          {stats.activeAssets}
                         </div>
                       </div>
                     </div>
@@ -1339,7 +1326,6 @@ export const BlocksView: React.FC = () => {
         isOpen={isAddAssetModalOpen}
         onClose={() => setIsAddAssetModalOpen(false)}
         initialBlock={selectedBlock || 'S Block'}
-        initialFloor={currentRoomObj?.floor || 'First Floor'}
         initialRoomNumber={selectedRoom || 'S110'}
       />
     </div>

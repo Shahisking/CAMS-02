@@ -198,6 +198,7 @@ export interface NotificationItem {
   timestamp: string;
   read: boolean;
   assetId?: string;
+  recipientRole?: Role;
 }
 
 export interface SystemSettings {
@@ -226,16 +227,5 @@ export interface AuditLog {
   timestamp: string;
 }
 
-export interface VendorDetails {
-  id: string;
-  name: string;
-  category: string;
-  contactPerson: string;
-  phone: string;
-  email: string;
-  gstin: string;
-  location: string;
-  rating: number;
-  status: 'Verified Partner' | 'Preferred Supplier' | 'Active';
-}
+
 

@@ -217,7 +217,7 @@ export const LandingPage: React.FC = () => {
               {
                 icon: <Wrench className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />,
                 title: 'Maintenance Ticket Engine',
-                desc: 'Raise repair requests, assign certified technicians, track cost estimation in ₹, and set priority levels.',
+                desc: 'Raise repair requests, assign certified technicians, track cost estimations, and set priority levels.',
               },
               {
                 icon: <Building2 className="w-6 h-6 text-purple-600 dark:text-purple-400" />,
@@ -272,8 +272,8 @@ export const LandingPage: React.FC = () => {
               <div className="text-slate-300 text-xs font-bold uppercase tracking-wider mt-2">Equipment Operational Rate</div>
             </div>
             <div>
-              <div className="stat-value text-4xl sm:text-6xl text-amber-400">₹14.2 Lakhs</div>
-              <div className="text-slate-300 text-xs font-bold uppercase tracking-wider mt-2">Saved in Maintenance</div>
+              <div className="stat-value text-4xl sm:text-6xl text-amber-400">99.8%</div>
+              <div className="text-slate-300 text-xs font-bold uppercase tracking-wider mt-2">System Uptime</div>
             </div>
           </div>
         </div>

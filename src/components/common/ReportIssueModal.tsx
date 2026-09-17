@@ -52,14 +52,15 @@ export const ReportIssueModal: React.FC<ReportIssueModalProps> = ({
       });
 
       await addNotification({
-        title: `Issue Reported: ${selectedAsset?.name || selectedAssetId}`,
-        message: `${currentUser?.fullName || 'User'} (${currentUser?.role}) reported an issue to System Monitor: ${issueType}`,
+        title: `New maintenance report submitted by ${currentUser?.role || 'User'}`,
+        message: `${selectedAsset?.name || 'Asset'} in ${selectedAsset?.building || ''} ${selectedAsset?.roomNumber ? `Room ${selectedAsset.roomNumber}` : ''} — ${issueType}`,
         type: 'warning',
         category: 'Maintenance',
         timestamp: new Date().toISOString(),
         assetId: selectedAssetId,
         read: false,
-      });
+        recipientRole: 'Monitor',
+      } as any);
 
       setIsSuccess(true);
       setTimeout(() => {

@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import defaultUserLogo from '../../assets/images/default_user_logo.svg';
 import { CollegeLogo } from '../common/CollegeLogo';
 import {
   Search,
@@ -62,7 +63,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   const searchRef = useRef<HTMLDivElement>(null);
 
-  const unreadCount = notifications.filter((n) => !n.read).length;
+  const unreadCount = notifications.filter((n) => !n.read && (!n.recipientRole || n.recipientRole === currentUser?.role)).length;
 
   // Close search dropdown on click outside or Escape key
   useEffect(() => {
@@ -144,7 +145,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             a.department.toLowerCase().includes(trimmedQuery) ||
             a.building.toLowerCase().includes(trimmedQuery) ||
             a.roomNumber.toLowerCase().includes(trimmedQuery) ||
-            a.assignedTo.toLowerCase().includes(trimmedQuery)
+            (a.assignedTo && a.assignedTo.toLowerCase().includes(trimmedQuery))
         )
         .slice(0, 5)
     : [];
@@ -361,7 +362,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
           )}
 
-          {/* Notifications Dropdown Toggle */}
+          {/* Notifications Dropdown Toggle - Monitor only */}
+          {isSystemMonitor && (
           <div className="relative">
             <button
               onClick={() => {
@@ -435,6 +437,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               </div>
             )}
           </div>
+          )}
 
           {/* User Profile Dropdown Pill */}
           <div className="relative">
@@ -446,10 +449,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
             >
               <img
-                src={
-                  currentUser?.avatar ||
-                  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'
-                }
+                src={currentUser?.avatar || defaultUserLogo}
                 alt={currentUser?.fullName || 'User'}
                 className="w-8 h-8 rounded-lg object-cover ring-2 ring-slate-300 dark:ring-slate-700"
               />

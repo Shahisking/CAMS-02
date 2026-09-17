@@ -19,7 +19,7 @@ import { useApp } from '../../context/AppContext';
 import { MaintenancePriority, MaintenanceStatus } from '../../types';
 
 export const MaintenanceView: React.FC = () => {
-  const { assets, maintenanceTickets, addMaintenanceTicket, updateMaintenanceTicket, currentUser } = useApp();
+  const { assets, maintenanceTickets, addMaintenanceTicket, updateMaintenanceTicket, addNotification, currentUser } = useApp();
 
   const isSystemMonitor =
     currentUser?.role === 'Monitor' ||
@@ -38,11 +38,11 @@ export const MaintenanceView: React.FC = () => {
 
   const selectedAsset = assets.find((a) => a.id === selectedAssetId);
 
-  const handleCreateTicket = (e: React.FormEvent) => {
+  const handleCreateTicket = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedAssetId || !problem || isSystemMonitor) return;
 
-    addMaintenanceTicket({
+    await addMaintenanceTicket({
       assetId: selectedAssetId,
       assetName: selectedAsset?.name || 'Unknown Asset',
       department: selectedAsset?.department || 'Computer Science & Engineering',
@@ -55,7 +55,20 @@ export const MaintenanceView: React.FC = () => {
       remarks,
     });
 
+    await addNotification({
+      title: `New maintenance report submitted by ${currentUser?.role || 'User'}`,
+      message: `${selectedAsset?.name || 'Asset'} in ${selectedAsset?.building || ''} ${selectedAsset?.roomNumber ? `Room ${selectedAsset.roomNumber}` : ''} — ${problem.substring(0, 100)}`,
+      type: 'warning',
+      category: 'Maintenance',
+      timestamp: new Date().toISOString(),
+      assetId: selectedAssetId,
+      read: false,
+      recipientRole: 'Monitor',
+    } as any);
+
     setShowCreateModal(false);
+    setProblem('');
+    setRemarks('');
   };
 
   const filteredTickets = maintenanceTickets.filter(

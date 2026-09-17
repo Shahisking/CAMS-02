@@ -228,12 +228,12 @@ export const ImportCSVModal: React.FC<ImportCSVModalProps> = ({ isOpen, onClose 
           building,
           floor,
           roomNumber,
-          purchaseCost: 0,
-          vendor: 'Standard Supplier',
+          vendor: '',
           warrantyExpiry: '2027-12-31',
           condition,
           status,
           assignedType: 'Department',
+          purchaseCost: 0,
         };
 
         await addAsset(newAssetData);

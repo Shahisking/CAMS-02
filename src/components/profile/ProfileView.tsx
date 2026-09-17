@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { User as UserIcon, Mail, Phone, Building, ShieldCheck, KeyRound, CheckCircle2 } from 'lucide-react';
+import defaultUserLogo from '../../assets/images/default_user_logo.svg';
 import { useApp } from '../../context/AppContext';
+import { changePassword } from '../../api';
 
 export const ProfileView: React.FC = () => {
   const { currentUser, updateUser } = useApp();
@@ -11,13 +13,33 @@ export const ProfileView: React.FC = () => {
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [savedSuccess, setSavedSuccess] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMessage('');
     if (currentUser) {
-      updateUser(currentUser.id, { fullName, mobile });
-      setSavedSuccess(true);
-      setTimeout(() => setSavedSuccess(false), 2500);
+      try {
+        if (oldPassword || newPassword) {
+          if (!oldPassword || !newPassword) {
+            setErrorMessage('Enter both your current password and a new password.');
+            return;
+          }
+          await changePassword(oldPassword, newPassword);
+          setOldPassword('');
+          setNewPassword('');
+          setSavedSuccess(true);
+          setTimeout(() => setSavedSuccess(false), 2500);
+          return;
+        }
+
+        await updateUser(currentUser.id, { fullName, mobile });
+        setSavedSuccess(true);
+        setTimeout(() => setSavedSuccess(false), 2500);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Unable to change password.';
+        setErrorMessage(message);
+      }
     }
   };
 
@@ -38,13 +60,16 @@ export const ProfileView: React.FC = () => {
         </div>
       )}
 
+      {errorMessage && (
+        <div className="p-4 bg-rose-500/10 border border-rose-500/30 text-rose-600 dark:text-rose-400 text-xs rounded-2xl">
+          {errorMessage}
+        </div>
+      )}
+
       <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-sm space-y-6">
         <div className="flex items-center gap-4 pb-6 border-b border-slate-100 dark:border-slate-800">
           <img
-            src={
-              currentUser?.avatar ||
-              'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80'
-            }
+            src={currentUser?.avatar || defaultUserLogo}
             alt={currentUser?.fullName}
             className="w-20 h-20 rounded-2xl object-cover ring-2 ring-blue-500/30"
           />

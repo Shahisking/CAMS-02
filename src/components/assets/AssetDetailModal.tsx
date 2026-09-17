@@ -13,7 +13,6 @@ import {
   Clock,
   User,
   Trash2,
-  DollarSign,
   Tag,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
@@ -112,18 +111,6 @@ export const AssetDetailModal: React.FC<AssetDetailModalProps> = ({
               <div className="p-3 bg-slate-50 dark:bg-slate-800/40 rounded-xl">
                 <span className="text-slate-400 font-medium">Room Number / Lab</span>
                 <div className="font-bold text-slate-900 dark:text-white mt-0.5">{asset.roomNumber}</div>
-              </div>
-
-              <div className="p-3 bg-slate-50 dark:bg-slate-800/40 rounded-xl">
-                <span className="text-slate-400 font-medium">Purchase Cost</span>
-                <div className="font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">
-                  ₹{asset.purchaseCost?.toLocaleString()}
-                </div>
-              </div>
-
-              <div className="p-3 bg-slate-50 dark:bg-slate-800/40 rounded-xl">
-                <span className="text-slate-400 font-medium">Vendor</span>
-                <div className="font-bold text-slate-900 dark:text-white mt-0.5">{asset.vendor}</div>
               </div>
 
               <div className="p-3 bg-slate-50 dark:bg-slate-800/40 rounded-xl">

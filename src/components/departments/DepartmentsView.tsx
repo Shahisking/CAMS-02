@@ -8,8 +8,6 @@ import {
   Search,
   ArrowRight,
   Plus,
-  IndianRupee,
-  MapPin,
   CheckCircle2,
   Sparkles,
 } from 'lucide-react';
@@ -183,7 +181,6 @@ export const DepartmentsView: React.FC<DepartmentsViewProps> = ({ onOpenAddAsset
           const totalCount = deptAssets.length;
           const activeCount = deptAssets.filter((a) => a.status === 'Active' || a.status === 'In Use').length;
           const maintenanceCount = deptAssets.filter((a) => a.status === 'Under Maintenance').length;
-          const totalValuation = deptAssets.reduce((sum, a) => sum + (a.purchaseCost || 0), 0);
 
           return (
             <motion.div
@@ -204,9 +201,6 @@ export const DepartmentsView: React.FC<DepartmentsViewProps> = ({ onOpenAddAsset
                       <h3 className="text-base font-bold text-[#111827] leading-tight">
                         {dept.name}
                       </h3>
-                      <p className="text-xs text-[#6B7280] flex items-center gap-1 mt-0.5">
-                        <MapPin className="w-3 h-3 text-[#9CA3AF]" /> {dept.building}
-                      </p>
                     </div>
                   </div>
                   <span className="px-2.5 py-1 bg-[#F3F4F6] rounded-full text-xs font-semibold text-[#374151] shrink-0">
@@ -227,7 +221,7 @@ export const DepartmentsView: React.FC<DepartmentsViewProps> = ({ onOpenAddAsset
                 </div>
 
                 {/* Metrics Row */}
-                <div className="grid grid-cols-3 gap-2 text-center py-2 border-y border-[#E5E7EB]">
+                <div className="grid grid-cols-2 gap-2 text-center py-2 border-y border-[#E5E7EB]">
                   <div>
                     <div className="text-[10px] uppercase tracking-wider text-[#6B7280] font-semibold">Active</div>
                     <div className="text-sm font-bold text-[#15803D] mt-0.5">{activeCount}</div>
@@ -235,12 +229,6 @@ export const DepartmentsView: React.FC<DepartmentsViewProps> = ({ onOpenAddAsset
                   <div>
                     <div className="text-[10px] uppercase tracking-wider text-[#6B7280] font-semibold">Maintenance</div>
                     <div className="text-sm font-bold text-[#D97706] mt-0.5">{maintenanceCount}</div>
-                  </div>
-                  <div>
-                    <div className="text-[10px] uppercase tracking-wider text-[#6B7280] font-semibold">Valuation</div>
-                    <div className="text-sm font-bold text-[#111827] mt-0.5">
-                      ₹{(totalValuation / 100000).toFixed(1)}L
-                    </div>
                   </div>
                 </div>
               </div>

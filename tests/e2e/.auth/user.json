@@ -1,0 +1,18 @@
+{
+  "cookies": [],
+  "origins": [
+    {
+      "origin": "http://localhost:3000",
+      "localStorage": [
+        {
+          "name": "cams_jwt",
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6IkFkbWluIiwiZW1haWwiOiJhZG1pbkBhaXQuZWR1LmluIiwiaWF0IjoxNzg5NDk3NzgwLCJleHAiOjE3OTAxMDI1ODB9.u7jRp-r43VCnyQMpDnQy9Fu28kXrrx898C5nS-GiREQ"
+        },
+        {
+          "name": "cams_current_user",
+          "value": "{\"id\":\"1\",\"full_name\":\"System Administrator\",\"email\":\"admin@ait.edu.in\",\"role\":\"Admin\",\"department\":\"Administrative Office\",\"staff_id\":\"AIT-ADM-001\",\"mobile\":null,\"avatar\":null,\"status\":\"Active\",\"created_at\":\"2026-09-09T18:07:52.897Z\",\"fullName\":\"System Administrator\",\"staffId\":\"AIT-ADM-001\"}"
+        }
+      ]
+    }
+  ]
+}

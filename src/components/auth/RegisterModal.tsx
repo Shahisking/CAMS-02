@@ -90,12 +90,6 @@ export const RegisterModal: React.FC = () => {
               <div className="text-xs text-blue-400 font-semibold">Registration</div>
             </div>
           </div>
-          <button
-            onClick={() => setActiveTab('landing')}
-            className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
         </div>
 
         <h2 className="text-2xl font-bold mb-1">Create CAMS Account</h2>

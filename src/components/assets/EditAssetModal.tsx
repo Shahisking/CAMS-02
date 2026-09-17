@@ -21,8 +21,6 @@ export const EditAssetModal: React.FC<EditAssetModalProps> = ({ asset, isOpen, o
   const [floor, setFloor] = useState<FloorName>('Ground Floor');
   const [buildingError, setBuildingError] = useState<string>('');
   const [roomNumber, setRoomNumber] = useState('');
-  const [purchaseCost, setPurchaseCost] = useState<number>(0);
-  const [vendor, setVendor] = useState('');
   const [warrantyExpiry, setWarrantyExpiry] = useState('');
   const [condition, setCondition] = useState<AssetCondition>('Good');
   const [status, setStatus] = useState<AssetStatus>('Active');
@@ -37,8 +35,6 @@ export const EditAssetModal: React.FC<EditAssetModalProps> = ({ asset, isOpen, o
       setFloor(asset.floor || 'First Floor');
       setBuildingError('');
       setRoomNumber(asset.roomNumber || '');
-      setPurchaseCost(asset.purchaseCost || 0);
-      setVendor(asset.vendor || '');
       setWarrantyExpiry(asset.warrantyExpiry || '');
       setCondition(asset.condition || 'Good');
       setStatus(asset.status || 'Active');
@@ -65,8 +61,8 @@ export const EditAssetModal: React.FC<EditAssetModalProps> = ({ asset, isOpen, o
       building: building as BuildingType,
       floor,
       roomNumber,
-      purchaseCost: Number(purchaseCost) || 0,
-      vendor,
+      purchaseCost: 0,
+      vendor: '',
       warrantyExpiry,
       condition,
       status,

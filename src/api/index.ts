@@ -6,7 +6,6 @@ import {
   NotificationItem,
   User,
   BlockItem,
-  VendorDetails,
 } from '../types';
 import {
   INITIAL_ASSETS,
@@ -15,7 +14,6 @@ import {
   INITIAL_NOTIFICATIONS,
   INITIAL_USERS,
   INITIAL_BLOCKS,
-  INITIAL_VENDORS,
 } from '../data/mockData';
 
 // Base URL for the backend API
@@ -68,11 +66,6 @@ export const fetchBlocks = async (): Promise<BlockItem[]> => {
 export const fetchRooms = async (): Promise<import('../types').RoomItem[]> => {
   const res = await axios.get<import('../types').RoomItem[]>(`${API_BASE}/rooms`, withAuthHeaders());
   return res.data || [];
-};
-
-export const fetchVendors = async (): Promise<VendorDetails[]> => {
-  const res = await axios.get<VendorDetails[]>(`${API_BASE}/vendors`, withAuthHeaders());
-  return res.data;
 };
 
 // ---------- CRUD (POST/PUT/DELETE) ----------
@@ -145,6 +138,22 @@ export const register = async (user: Partial<User> & { password?: string }) => {
   return res.data; // { token, user }
 };
 
+export const changePassword = async (currentPassword: string, newPassword: string) => {
+  try {
+    const res = await axios.post(
+      `${API_BASE}/auth/change-password`,
+      { currentPassword, newPassword },
+      withAuthHeaders()
+    );
+    return res.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.message || 'Unable to change password');
+    }
+    throw error;
+  }
+};
+
 
 // ---------- ADMIN USER MANAGEMENT ----------
 export const createUser = async (data: { email: string; password: string; name: string; role: string; department?: string; staffId?: string }) => {
@@ -164,5 +173,41 @@ export const fetchLoginHistory = async () => {
 
 export const fetchAuditLogsApi = async () => {
   const res = await axios.get(`${API_BASE}/auth/audit-logs`, withAuthHeaders());
+  return res.data;
+};
+
+// ---------- MAINTENANCE TICKETS ----------
+export const fetchMaintenanceTickets = async (): Promise<import('../types').MaintenanceTicket[]> => {
+  const res = await axios.get<import('../types').MaintenanceTicket[]>(`${API_BASE}/maintenance`, withAuthHeaders());
+  return res.data;
+};
+
+export const createMaintenanceTicket = async (ticket: Omit<import('../types').MaintenanceTicket, 'id' | 'requestDate'>): Promise<import('../types').MaintenanceTicket> => {
+  const res = await axios.post<import('../types').MaintenanceTicket>(`${API_BASE}/maintenance`, ticket, withAuthHeaders());
+  return res.data;
+};
+
+export const updateMaintenanceTicketApi = async (id: string, updates: Record<string, any>): Promise<import('../types').MaintenanceTicket> => {
+  const res = await axios.patch<import('../types').MaintenanceTicket>(`${API_BASE}/maintenance/${id}`, updates, withAuthHeaders());
+  return res.data;
+};
+
+// ---------- NOTIFICATIONS (PERSISTED) ----------
+export const createNotificationApi = async (notif: { title: string; message: string; type: string; category: string; assetId?: string; recipientRole?: string }) => {
+  const res = await axios.post(`${API_BASE}/notifications`, notif, withAuthHeaders());
+  return res.data;
+};
+
+export const markNotificationReadApi = async (id: string) => {
+  await axios.patch(`${API_BASE}/notifications/${id}/read`, {}, withAuthHeaders());
+};
+
+export const clearAllNotificationsApi = async () => {
+  await axios.delete(`${API_BASE}/notifications/all`, withAuthHeaders());
+};
+
+// ---------- ALLOCATIONS (PERSISTED) ----------
+export const createAllocationApi = async (data: Omit<import('../types').AllocationHistory, 'id'>) => {
+  const res = await axios.post(`${API_BASE}/allocations`, data, withAuthHeaders());
   return res.data;
 };

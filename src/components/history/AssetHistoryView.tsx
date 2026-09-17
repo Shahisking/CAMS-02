@@ -7,7 +7,6 @@ import {
   ArrowLeftRight,
   Wrench,
   CheckCircle2,
-  DollarSign,
   User,
   Filter,
 } from 'lucide-react';
@@ -92,11 +91,6 @@ export const AssetHistoryView: React.FC = () => {
 
                   <div className="flex items-center justify-between text-[11px] text-slate-400 pt-2 border-t border-slate-200/50 dark:border-slate-700/50">
                     <span>Performed By: {event.performedBy}</span>
-                    {event.cost && (
-                      <span className="font-bold text-emerald-600 dark:text-emerald-400">
-                        Amount: ₹{event.cost.toLocaleString()}
-                      </span>
-                    )}
                   </div>
                 </div>
               </motion.div>

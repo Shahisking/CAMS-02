@@ -1,0 +1,57 @@
+/* src/styles/designTokens.css */
+:root {
+  /* Primary Colors */
+  --color-primary-slate-900: #0F172A;
+  --color-primary-blue-500: #3B82F6;
+  --color-primary-white: #FFFFFF;
+
+  /* Secondary Colors */
+  --color-secondary-gray-600: #4B5563;
+  --color-secondary-gray-200: #E5E7EB;
+  --color-success-green-600: #16A34A;
+  --color-warning-amber-600: #D97706;
+  --color-tertiary-purple-600: #9333EA;
+  --color-neutral-gray-50: #F9FAFB;
+
+  /* Text Colors */
+  --text-primary: #111827;
+  --text-secondary: #4B5563;
+  --text-tertiary: #9CA3AF;
+
+  /* Interactive */
+  --interactive-primary: var(--color-primary-blue-500);
+  --interactive-hover: #2563EB;
+  --interactive-light: #EFF6FF;
+
+  /* Spacing */
+  --spacing-2: 2px;
+  --spacing-4: 4px;
+  --spacing-8: 8px;
+  --spacing-12: 12px;
+  --spacing-16: 16px;
+  --spacing-24: 24px;
+  --spacing-32: 32px;
+
+  /* Border Radius */
+  --radius-card: 8px;
+  --radius-small: 4px;
+  --radius-pill: 9999px;
+
+  /* Shadows */
+  --shadow-subtle: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-hover: 0 4px 6px rgba(0,0,0,0.1);
+  --shadow-modal: 0 20px 25px rgba(0,0,0,0.15);
+
+  /* Transitions */
+  --transition-default: 150ms ease-in-out;
+  --transition-hover: 200ms ease-in-out;
+  --transition-modal: 300ms ease-out;
+}
+
+/* Dark mode overrides */
+.dark {
+  --color-primary-slate-900: #0F172A;
+  --color-primary-white: #111827;
+  --color-secondary-gray-200: #1E293B;
+  --color-neutral-gray-50: #111827;
+}

@@ -15,7 +15,6 @@ import {
   AuditLog,
   BlockItem,
   RoomItem,
-  VendorDetails,
 } from '../types';
 import {
   INITIAL_ASSETS,
@@ -26,7 +25,6 @@ import {
   INITIAL_SETTINGS,
   INITIAL_USERS,
   INITIAL_AUDIT_LOGS,
-  INITIAL_VENDORS,
   AUTHORIZED_EMAILS,
 } from '../data/mockData';
 
@@ -39,7 +37,7 @@ import {
   fetchUsers,
   fetchBlocks,
   fetchRooms,
-  fetchVendors,
+  fetchMaintenanceTickets,
   createAsset as apiCreateAsset,
   updateAsset as apiUpdateAsset,
   deleteAsset as apiDeleteAsset,
@@ -54,6 +52,12 @@ import {
   register as apiRegister,
   createUser as apiCreateUser,
   updateUser as apiUpdateUser,
+  createMaintenanceTicket as apiCreateMaintenanceTicket,
+  updateMaintenanceTicketApi,
+  createNotificationApi,
+  markNotificationReadApi,
+  clearAllNotificationsApi,
+  createAllocationApi,
 } from '../api';
 
 export type ActiveTab =
@@ -103,8 +107,6 @@ interface AppContextType {
   deleteUser: (id: string) => void;
   failedAttemptsMap: Record<string, number>;
   unlockAccount: (id: string) => void;
-  vendors: VendorDetails[];
-  addVendor: (vendor: Omit<VendorDetails, 'id'>) => Promise<void>;
   // Existing fields continue below
   activeTab: ActiveTab;
   setActiveTab: (tab: ActiveTab) => void;
@@ -247,9 +249,8 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   }, [rooms, assets]);
 
   const [maintenanceTickets, setMaintenanceTickets] = useState<MaintenanceTicket[]>(INITIAL_MAINTENANCE_TICKETS);
-  // Added state for users and vendors
+  // Added state for users
   const [users, setUsers] = useState<User[]>(INITIAL_USERS);
-  const [vendors, setVendors] = useState<VendorDetails[]>(INITIAL_VENDORS);
   const [allocationLogs, setAllocationLogs] = useState<AllocationHistory[]>(INITIAL_ALLOCATION_LOGS);
   const [historyEvents, setHistoryEvents] = useState<HistoryEvent[]>(INITIAL_HISTORY_EVENTS);
   
@@ -278,7 +279,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
       try {
         setIsLoading(true);
-        const [a, al, h, n, u, b, r, v] = await Promise.all([
+        const [a, al, h, n, u, b, r, mt] = await Promise.all([
           fetchAssets(),
           fetchAllocationLogs(),
           fetchHistoryEvents(),
@@ -286,16 +287,16 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
           fetchUsers(),
           fetchBlocks(),
           fetchRooms(),
-          fetchVendors(),
+          fetchMaintenanceTickets(),
         ]);
         setAssets(a.length ? a : INITIAL_ASSETS);
         setAllocationLogs(al.length ? al : INITIAL_ALLOCATION_LOGS);
         setHistoryEvents(h.length ? h : INITIAL_HISTORY_EVENTS);
         setNotifications(n.length ? n : INITIAL_NOTIFICATIONS);
         setUsers(u.length ? u : INITIAL_USERS);
-        setVendors(v.length ? v : INITIAL_VENDORS);
         setBlocks(b);
         setRooms(r);
+        setMaintenanceTickets(mt.length ? mt : INITIAL_MAINTENANCE_TICKETS);
         setAppError(null);
       } catch (e) {
         console.error('Failed to load protected app data', e);
@@ -395,17 +396,22 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   };
 
   const transferAsset = async (assetId: string, toLocation: string, comment?: string, user?: User) => {
-      const newLog: AllocationHistory = {
-        id: `alloc-${Date.now()}`,
+      const asset = assets.find(a => a.id === assetId);
+      const allocationData = {
         assetId,
-        assetName: assets.find(a => a.id === assetId)?.name || 'Unknown',
-        fromLocation: assets.find(a => a.id === assetId)?.location || 'Unknown',
+        assetName: asset?.name || 'Unknown',
+        fromLocation: asset?.location || asset?.roomNumber || 'Unknown',
         toLocation,
-        fromAssignee: assets.find(a => a.id === assetId)?.assignedTo || 'Unknown',
+        fromAssignee: asset?.assignedTo || 'Unknown',
         toAssignee: toLocation,
         transferredBy: user?.fullName || currentUser?.fullName || 'System',
         date: new Date().toISOString(),
-        reason: comment ?? ''
+        reason: comment ?? '',
+      };
+      const created = await createAllocationApi(allocationData);
+      const newLog: AllocationHistory = {
+        ...allocationData,
+        id: created.id || `alloc-${Date.now()}`,
       };
     setAllocationLogs(p => [newLog, ...p]);
   };
@@ -454,23 +460,42 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     setSelectedBlockFilter,
     maintenanceTickets,
       addMaintenanceTicket: async (ticket) => {
-        const newTicket = { ...ticket, id: `ticket-${Date.now()}`, requestDate: new Date().toISOString() } as MaintenanceTicket;
-        setMaintenanceTickets(p => [newTicket, ...p]);
+        const created = await apiCreateMaintenanceTicket(ticket);
+        setMaintenanceTickets(p => [created, ...p]);
       },
-    updateMaintenanceTicket: async (id, upd) => {},
+    updateMaintenanceTicket: async (id, upd) => {
+      const updated = await updateMaintenanceTicketApi(id, upd);
+      setMaintenanceTickets(p => p.map(t => (t.id === id ? { ...t, ...updated } : t)));
+    },
     allocationLogs,
     transferAsset,
     // New added fields
     historyEvents,
     notifications,
     addNotification: async (notif) => {
-      const newNotif = { ...notif, id: `notif-${Date.now()}`, read: false } as NotificationItem;
+      const created = await createNotificationApi({
+        title: notif.title,
+        message: notif.message,
+        type: notif.type,
+        category: notif.category,
+        assetId: notif.assetId,
+        recipientRole: (notif as any).recipientRole,
+      });
+      const newNotif: NotificationItem = {
+        ...notif,
+        id: created.id || `notif-${Date.now()}`,
+        read: false,
+      };
       setNotifications(p => [newNotif, ...p]);
     },
-    markNotificationRead: (id) => {
+    markNotificationRead: async (id) => {
+      await markNotificationReadApi(id);
       setNotifications(p => p.map(n => n.id === id ? { ...n, read: true } : n));
     },
-    clearAllNotifications: () => setNotifications([]),
+    clearAllNotifications: async () => {
+      await clearAllNotificationsApi();
+      setNotifications([]);
+    },
     settings,
     updateSettings: (upd) => setSettings(s => ({ ...s, ...upd })),
     resetAllData: () => {
@@ -479,7 +504,6 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       setUsers(INITIAL_USERS);
       setNotifications(INITIAL_NOTIFICATIONS);
       setAuditLogs(INITIAL_AUDIT_LOGS);
-      setVendors(INITIAL_VENDORS);
     },
     auditLogs,
     users,
@@ -524,11 +548,6 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     failedAttemptsMap,
     unlockAccount: (id) => {
       // stub: no-op
-    },
-    vendors,
-    addVendor: async (vendor) => {
-      const newVendor = { ...vendor, id: `vendor-${Date.now()}` } as VendorDetails;
-      setVendors(p => [newVendor, ...p]);
     },
   } as any;
 

@@ -8,6 +8,7 @@ import {
   Trash2,
   CheckCheck,
   Filter,
+  ShieldAlert,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 
@@ -16,9 +17,32 @@ export const NotificationsView: React.FC = () => {
   const isMonitor = currentUser?.role === 'Monitor';
   const [filterCategory, setFilterCategory] = useState<string>('All');
 
-  const filtered = notifications.filter(
+  // Role-based filtering: show notifications where recipientRole is null (legacy) or matches current user role
+  const roleFiltered = notifications.filter(
+    (n) => !n.recipientRole || n.recipientRole === currentUser?.role
+  );
+
+  const filtered = roleFiltered.filter(
     (n) => filterCategory === 'All' || n.category === filterCategory
   );
+
+  // Access denied for non-Monitor users
+  if (!isMonitor) {
+    return (
+      <div className="p-8 max-w-7xl mx-auto">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-12 text-center">
+          <ShieldAlert className="w-16 h-16 text-slate-300 dark:text-slate-600 mx-auto mb-4" />
+          <h3 className="text-xl font-bold text-slate-700 dark:text-slate-300 mb-2">
+            Access Restricted
+          </h3>
+          <p className="text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto">
+            Only the System Monitor can access the Notification Center. 
+            Maintenance reports and issue submissions are visible to the System Monitor.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
@@ -46,6 +70,7 @@ export const NotificationsView: React.FC = () => {
       <div className="flex flex-wrap gap-2">
         {[
           'All',
+          'Maintenance',
           'Maintenance Due',
           'Warranty Expired',
           'Asset Added',

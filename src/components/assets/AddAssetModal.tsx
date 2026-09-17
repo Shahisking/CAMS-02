@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { X, QrCode, Plus, Image as ImageIcon, Sparkles, Building, Calendar, DollarSign, Tag } from 'lucide-react';
+import { X, QrCode, Plus, Image as ImageIcon, Sparkles, Building, Calendar, Tag, DoorOpen } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
-import { CategoryType, Department, Building as BuildingType, AssetCondition, AssetStatus, FloorName } from '../../types';
-import { CascadingLocationSelect } from '../common/CascadingLocationSelect';
+import { CategoryType, Department, Building as BuildingType, AssetCondition, AssetStatus } from '../../types';
 
 interface AddAssetModalProps {
   isOpen: boolean;
   onClose: () => void;
   initialBlock?: string;
-  initialFloor?: FloorName;
   initialRoomNumber?: string;
 }
 
@@ -17,21 +15,17 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
   isOpen,
   onClose,
   initialBlock = 'S Block',
-  initialFloor = 'First Floor',
   initialRoomNumber = 'S110',
 }) => {
-  const { addAsset, currentUser } = useApp();
+  const { addAsset, currentUser, buildingBlocks } = useApp();
 
   const [name, setName] = useState('');
   const [category, setCategory] = useState<CategoryType>('Computer');
   const [department, setDepartment] = useState<Department>('Artificial Intelligence & Data Science');
   const [building, setBuilding] = useState<BuildingType | string>(initialBlock);
-  const [floor, setFloor] = useState<FloorName>(initialFloor);
   const [roomNumber, setRoomNumber] = useState<string>(initialRoomNumber);
   const [buildingError, setBuildingError] = useState<string>('');
   const [condition, setCondition] = useState<AssetCondition>('New');
-  const [purchaseCost, setPurchaseCost] = useState<number>(45000);
-  const [vendor, setVendor] = useState('Dell India Pvt Ltd');
   const [warrantyExpiry, setWarrantyExpiry] = useState('2028-03-31');
   const [status, setStatus] = useState<AssetStatus>('Active');
   const [assignedType, setAssignedType] = useState<'Faculty' | 'Department' | 'Lab' | 'Classroom' | 'Hostel' | 'Store Room'>('Lab');
@@ -59,10 +53,9 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
       category,
       department,
       building: building as BuildingType,
-      floor,
       roomNumber,
-      purchaseCost: Number(purchaseCost) || 0,
-      vendor,
+      purchaseCost: 0,
+      vendor: '',
       warrantyExpiry,
       condition,
       status,
@@ -187,26 +180,74 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
             </div>
           </div>
 
-          {/* Hierarchical Campus Location Selection (Building Block -> Floor -> Room Number) */}
+          {/* Location: Block Name + Room Number */}
           <div className="bg-slate-50 dark:bg-slate-800/50 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700/80">
-            <CascadingLocationSelect
-              selectedBlock={building}
-              selectedFloor={floor}
-              selectedRoomNumber={roomNumber}
-              onBlockChange={(blk) => {
-                setBuilding(blk);
-                setBuildingError('');
-              }}
-              onFloorChange={(flr) => setFloor(flr)}
-              onRoomChange={(rm, roomObj) => {
-                setRoomNumber(rm);
-                if (roomObj?.department) {
-                  setDepartment(roomObj.department);
-                }
-              }}
-              error={buildingError}
-              required
-            />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* Block Name */}
+              <div>
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1.5">
+                  <Building className="w-3.5 h-3.5 text-[#2563EB]" />
+                  <span>Block Name <span className="text-rose-500">*</span></span>
+                </label>
+                <div className="relative">
+                  <select
+                    value={buildingBlocks.includes(building as string) ? building : ''}
+                    onChange={(e) => {
+                      if (e.target.value) {
+                        setBuilding(e.target.value);
+                        setBuildingError('');
+                      }
+                    }}
+                    className={`w-full bg-slate-50 dark:bg-slate-800 border text-slate-900 dark:text-white text-xs rounded-xl px-3 py-2.5 outline-none cursor-pointer appearance-none ${
+                      buildingError ? 'border-rose-500' : 'border-slate-200 dark:border-slate-700 focus:border-[#2563EB]'
+                    }`}
+                  >
+                    <option value="">Select or type below</option>
+                    {buildingBlocks.map((b) => (
+                      <option key={b} value={b}>
+                        {b}
+                      </option>
+                    ))}
+                  </select>
+                  <Building className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                </div>
+                <input
+                  type="text"
+                  value={buildingBlocks.includes(building as string) ? '' : building}
+                  onChange={(e) => {
+                    setBuilding(e.target.value);
+                    setBuildingError('');
+                  }}
+                  placeholder="Or type custom block name (e.g. S Block)"
+                  className={`w-full mt-2 bg-white dark:bg-slate-800 border text-slate-900 dark:text-white text-xs rounded-xl px-3 py-2.5 outline-none focus:border-[#2563EB] ${
+                    buildingError ? 'border-rose-500' : 'border-slate-200 dark:border-slate-700'
+                  }`}
+                />
+              </div>
+
+              {/* Room Number */}
+              <div>
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1.5">
+                  <DoorOpen className="w-3.5 h-3.5 text-[#2563EB]" />
+                  <span>Room Number <span className="text-rose-500">*</span></span>
+                </label>
+                <input
+                  type="text"
+                  value={roomNumber}
+                  onChange={(e) => setRoomNumber(e.target.value)}
+                  placeholder="e.g. S110, N205, Lab 3"
+                  className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs rounded-xl px-3 py-2.5 outline-none focus:border-[#2563EB]"
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Validation Error Message */}
+            {buildingError && (
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-rose-600 mt-2">
+                <span>{buildingError}</span>
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

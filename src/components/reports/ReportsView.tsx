@@ -16,7 +16,6 @@ import {
   AlertTriangle,
   Search,
   Filter,
-  DollarSign,
   Layers,
 } from 'lucide-react';
 import {
@@ -44,7 +43,6 @@ export const ReportsView: React.FC = () => {
 
   // 1. Live Executive Metrics
   const totalAssetsCount = assets.length;
-  const totalValuation = assets.reduce((acc, a) => acc + (a.purchaseCost || 0), 0);
   
   const totalMaintenanceCost = maintenanceTickets.reduce(
     (acc, t) => acc + (Number(t.estimatedCost) || Number(t.actualCost) || 0),
@@ -97,20 +95,18 @@ export const ReportsView: React.FC = () => {
     cost: monthlyCostMap[m] || 0,
   }));
 
-  // 4. Chart 3: Live Department Valuation & Count Breakdown (Bar)
-  const deptMap: Record<string, { count: number; valuation: number }> = {};
+  // 4. Chart 3: Department Asset Count Breakdown (Bar)
+  const deptMap: Record<string, { count: number }> = {};
   assets.forEach((a) => {
     const dept = a.department || 'General';
-    if (!deptMap[dept]) deptMap[dept] = { count: 0, valuation: 0 };
+    if (!deptMap[dept]) deptMap[dept] = { count: 0 };
     deptMap[dept].count += 1;
-    deptMap[dept].valuation += a.purchaseCost || 0;
   });
 
   const deptChartData = Object.entries(deptMap).map(([dept, data]) => ({
     name: dept.length > 14 ? dept.substring(0, 12) + '...' : dept,
     fullName: dept,
     count: data.count,
-    valuationLakhs: Number((data.valuation / 100000).toFixed(2)),
   }));
 
   // 5. Chart 4: Maintenance Priority Breakdown (Bar)
@@ -131,9 +127,9 @@ export const ReportsView: React.FC = () => {
     let filename = `AIT_CAMS_Live_Report_${new Date().toISOString().split('T')[0]}.csv`;
 
     if (activeReportTab === 'department') {
-      headers = 'Department Name,Total Asset Count,Total Valuation (INR),Valuation (Lakhs)';
+      headers = 'Department Name,Total Asset Count';
       rows = Object.entries(deptMap).map(
-        ([dept, data]) => `"${dept}",${data.count},${data.valuation},${(data.valuation / 100000).toFixed(2)}`
+        ([dept, data]) => `"${dept}",${data.count}`
       );
     } else if (activeReportTab === 'maintenance') {
       headers = 'Ticket ID,Asset ID,Asset Name,Department,Problem,Priority,Estimated Cost (INR),Status,Request Date';
@@ -142,10 +138,10 @@ export const ReportsView: React.FC = () => {
           `"${t.id}","${t.assetId}","${t.assetName}","${t.department}","${t.problem}","${t.priority}",${t.estimatedCost},"${t.status}","${t.requestDate}"`
       );
     } else {
-      headers = 'Asset ID,Asset Name,Category,Department,Building Block,Room,Purchase Cost (INR),Condition,Status';
+      headers = 'Asset ID,Asset Name,Category,Department,Building Block,Room,Condition,Status';
       rows = assets.map(
         (a) =>
-          `"${a.id}","${a.name}","${a.category}","${a.department}","${a.building}","${a.roomNumber}",${a.purchaseCost},"${a.condition}","${a.status}"`
+          `"${a.id}","${a.name}","${a.category}","${a.department}","${a.building}","${a.roomNumber}","${a.condition}","${a.status}"`
       );
     }
 
@@ -200,7 +196,7 @@ export const ReportsView: React.FC = () => {
             Institutional Asset Reports & Live Analytics
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Dynamic live valuation, maintenance expenditure trends, and department condition audits
+            Live maintenance expenditure trends, asset condition audits, and department breakdowns
           </p>
         </div>
 
@@ -223,28 +219,7 @@ export const ReportsView: React.FC = () => {
       </div>
 
       {/* Top Stat Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {/* Total Valuation */}
-        <div className="p-6 bg-white rounded-2xl border border-slate-200 shadow-xs flex flex-col justify-between">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-              Total Inventory Valuation
-            </span>
-            <div className="w-9 h-9 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
-              ₹
-            </div>
-          </div>
-          <div className="mt-4">
-            <div className="text-3xl font-extrabold text-slate-900 font-sans tracking-tight">
-              ₹{(totalValuation / 100000).toFixed(2)} Lakhs
-            </div>
-            <div className="text-xs text-slate-500 font-medium mt-1.5 flex items-center gap-1">
-              <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" />
-              Real-time DB Total: ₹{totalValuation.toLocaleString('en-IN')}
-            </div>
-          </div>
-        </div>
-
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {/* Maintenance Cost */}
         <div className="p-6 bg-white rounded-2xl border border-slate-200 shadow-xs flex flex-col justify-between">
           <div className="flex items-center justify-between">
@@ -390,15 +365,15 @@ export const ReportsView: React.FC = () => {
           </div>
         </div>
 
-        {/* Bar Chart 1: Department Valuation & Asset Count */}
+        {/* Bar Chart 1: Department Asset Count */}
         <div className="lg:col-span-7 bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-xs space-y-4">
           <div className="flex items-center justify-between border-b border-slate-100 pb-4">
             <div>
               <h3 className="text-base font-bold text-slate-900 font-sans">
-                Department Asset Valuation (₹ Lakhs)
+                Department Asset Distribution
               </h3>
               <p className="text-xs text-slate-500 mt-0.5">
-                Capital asset cost distribution by academic and administrative departments
+                Asset count distribution across academic and administrative departments
               </p>
             </div>
             <span className="text-xs font-semibold text-blue-600">
@@ -420,9 +395,9 @@ export const ReportsView: React.FC = () => {
                     fontSize: '12px',
                     border: 'none',
                   }}
-                  formatter={(val: any) => [`₹${val} Lakhs`, 'Total Valuation']}
+                  formatter={(val: any) => [`${val} assets`, 'Asset Count']}
                 />
-                <Bar dataKey="valuationLakhs" fill="#2563EB" radius={[6, 6, 0, 0]} barSize={32} />
+                <Bar dataKey="count" fill="#2563EB" radius={[6, 6, 0, 0]} barSize={32} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -540,27 +515,23 @@ export const ReportsView: React.FC = () => {
                 <tr>
                   <th className="py-3 px-4">Department</th>
                   <th className="py-3 px-4">Total Registered Assets</th>
-                  <th className="py-3 px-4">Total Valuation (INR)</th>
-                  <th className="py-3 px-4">Valuation (Lakhs)</th>
                   <th className="py-3 px-4">Share of Total Portfolio</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-slate-900">
                 {filteredDeptList.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="py-8 text-center text-slate-500 font-semibold">
+                    <td colSpan={3} className="py-8 text-center text-slate-500 font-semibold">
                       No matching department report entries
                     </td>
                   </tr>
                 ) : (
                   filteredDeptList.map(([dept, data]) => {
-                    const pct = totalValuation > 0 ? ((data.valuation / totalValuation) * 100).toFixed(1) : '0';
+                    const pct = totalAssetsCount > 0 ? ((data.count / totalAssetsCount) * 100).toFixed(1) : '0';
                     return (
                       <tr key={dept} className="hover:bg-slate-50 transition-colors">
                         <td className="py-3.5 px-4 font-bold text-slate-900">{dept}</td>
                         <td className="py-3.5 px-4 font-semibold text-blue-600">{data.count} items</td>
-                        <td className="py-3.5 px-4 font-mono font-medium">₹{data.valuation.toLocaleString('en-IN')}</td>
-                        <td className="py-3.5 px-4 font-bold text-emerald-600">₹{(data.valuation / 100000).toFixed(2)} Lakhs</td>
                         <td className="py-3.5 px-4 font-medium text-slate-600">{pct}%</td>
                       </tr>
                     );
@@ -653,7 +624,6 @@ export const ReportsView: React.FC = () => {
                   <th className="py-3 px-4">Category</th>
                   <th className="py-3 px-4">Department</th>
                   <th className="py-3 px-4">Building & Room</th>
-                  <th className="py-3 px-4">Purchase Cost</th>
                   <th className="py-3 px-4">Condition</th>
                   <th className="py-3 px-4">Status</th>
                 </tr>
@@ -661,7 +631,7 @@ export const ReportsView: React.FC = () => {
               <tbody className="divide-y divide-slate-100 text-slate-900">
                 {filteredAssetsList.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="py-8 text-center text-slate-500 font-semibold">
+                    <td colSpan={7} className="py-8 text-center text-slate-500 font-semibold">
                       No matching asset inventory records found
                     </td>
                   </tr>
@@ -673,9 +643,6 @@ export const ReportsView: React.FC = () => {
                       <td className="py-3.5 px-4 text-slate-600 font-medium">{a.category}</td>
                       <td className="py-3.5 px-4 text-slate-600 font-medium">{a.department}</td>
                       <td className="py-3.5 px-4 text-slate-600 font-medium">{a.building} ({a.roomNumber})</td>
-                      <td className="py-3.5 px-4 font-mono font-bold text-emerald-600">
-                        ₹{(a.purchaseCost || 0).toLocaleString('en-IN')}
-                      </td>
                       <td className="py-3.5 px-4 font-semibold">
                         <span className="px-2 py-0.5 rounded text-[10px] bg-slate-100 text-slate-800">
                           {a.condition}

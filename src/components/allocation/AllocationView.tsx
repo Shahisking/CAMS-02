@@ -23,13 +23,16 @@ export const AllocationView: React.FC = () => {
 
   const currentAsset = assets.find((a) => a.id === selectedAssetId);
 
-  const handleTransferSubmit = (e: React.FormEvent) => {
+  const handleTransferSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedAssetId || !toLocation || !toAssignee) return;
 
-    transferAsset(selectedAssetId, toLocation, toAssignee, reason);
+    await transferAsset(selectedAssetId, toLocation, reason);
     setTransferSuccess(true);
     setTimeout(() => setTransferSuccess(false), 4000);
+    setToLocation('');
+    setToAssignee('');
+    setReason('');
   };
 
   const handleResetForm = () => {

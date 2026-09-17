@@ -108,6 +108,7 @@ app.use('/api/blocks',        require('./routes/blocks'));
 app.use('/api/rooms',         require('./routes/rooms'));
 app.use('/api/requests',      require('./routes/requests'));
 app.use('/api/vendors',       require('./routes/vendors'));
+app.use('/api/maintenance',   require('./routes/maintenance'));
 
 // Global Error Handler to prevent leaking sensitive errors
 app.use((err, req, res, next) => {
@@ -141,9 +142,84 @@ async function ensureRoomsTable() {
   }
 }
 
+async function ensureMaintenanceTicketsTable() {
+  try {
+    await getDB().query(`
+      CREATE TABLE IF NOT EXISTS maintenance_tickets (
+        id SERIAL PRIMARY KEY,
+        asset_id VARCHAR(50),
+        asset_name VARCHAR(255) DEFAULT 'Unknown Asset',
+        department VARCHAR(255) DEFAULT 'General',
+        problem TEXT DEFAULT '',
+        priority VARCHAR(50) DEFAULT 'Medium',
+        assigned_technician VARCHAR(255) DEFAULT 'Pending Monitor Assignment',
+        estimated_cost NUMERIC DEFAULT 0,
+        actual_cost NUMERIC,
+        status VARCHAR(50) DEFAULT 'Pending',
+        requested_by VARCHAR(255) DEFAULT '',
+        request_date TIMESTAMPTZ DEFAULT NOW(),
+        completed_date TIMESTAMPTZ,
+        remarks TEXT,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      );
+    `);
+    console.log('✅ Verified maintenance_tickets table exists');
+  } catch (err) {
+    console.error('❌ Failed to ensure maintenance_tickets table exists:', err.message);
+  }
+}
+
+async function ensureNotificationsRecipientRole() {
+  try {
+    await getDB().query(`
+      DO $$ BEGIN
+        ALTER TABLE notifications ADD COLUMN IF NOT EXISTS recipient_role VARCHAR(50);
+      EXCEPTION WHEN duplicate_column THEN NULL;
+      END $$;
+    `);
+    console.log('✅ Verified notifications.recipient_role column exists');
+  } catch (err) {
+    console.error('❌ Failed to ensure notifications.recipient_role column:', err.message);
+  }
+}
+
+async function ensureAuditLogColumns() {
+  try {
+    await getDB().query(`
+      DO $$ BEGIN
+        ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS user_email VARCHAR(255);
+      EXCEPTION WHEN duplicate_column THEN NULL;
+      END $$;
+      DO $$ BEGIN
+        ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS role VARCHAR(50);
+      EXCEPTION WHEN duplicate_column THEN NULL;
+      END $$;
+      DO $$ BEGIN
+        ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS department VARCHAR(255);
+      EXCEPTION WHEN duplicate_column THEN NULL;
+      END $$;
+      DO $$ BEGIN
+        ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS details TEXT;
+      EXCEPTION WHEN duplicate_column THEN NULL;
+      END $$;
+      DO $$ BEGIN
+        ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS timestamp TIMESTAMPTZ DEFAULT NOW();
+      EXCEPTION WHEN duplicate_column THEN NULL;
+      END $$;
+    `);
+    console.log('✅ Verified audit_logs extended columns exist');
+  } catch (err) {
+    console.error('❌ Failed to ensure audit_logs columns:', err.message);
+  }
+}
+
 // Connect to PostgreSQL
 connectDB();
 ensureRoomsTable();
+ensureMaintenanceTicketsTable();
+ensureNotificationsRecipientRole();
+ensureAuditLogColumns();
 
 app.listen(PORT, () => {
   console.log(`Server listening on http://localhost:${PORT}`);

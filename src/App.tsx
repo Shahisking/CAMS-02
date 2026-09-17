@@ -16,7 +16,6 @@ import { AssetDetailModal } from './components/assets/AssetDetailModal';
 import { CategoriesView } from './components/categories/CategoriesView';
 import { DepartmentsView } from './components/departments/DepartmentsView';
 import { BlocksView } from './components/blocks/BlocksView';
-import { VendorsView } from './components/vendors/VendorsView';
 import { AllocationView } from './components/allocation/AllocationView';
 import { MaintenanceView } from './components/maintenance/MaintenanceView';
 import { QRScannerModal } from './components/qr/QRScannerModal';
@@ -59,6 +58,13 @@ const MainAppContent: React.FC = () => {
       );
     }
     return <LoginPage onClose={() => setActiveTab('dashboard')} />;
+  }
+
+  // Restrict Create CAMS Account page to System Monitor and Administrator only
+  if (currentUser && activeTab === 'register') {
+    if (currentUser.role !== 'System Monitor' && currentUser.role !== 'Admin') {
+      setActiveTab('dashboard');
+    }
   }
 
   // Full-screen Dedicated Login Page view if explicitly navigated to
@@ -104,7 +110,7 @@ const MainAppContent: React.FC = () => {
         onSelectAsset={(id) => setSelectedAssetDetailId(id)}
       />
 
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 min-h-0 flex overflow-hidden">
         <Sidebar
           isCollapsed={isSidebarCollapsed}
           onToggleCollapse={() => setIsSidebarCollapsed((prev) => !prev)}
@@ -136,10 +142,6 @@ const MainAppContent: React.FC = () => {
           )}
 
           {activeTab === 'blocks' && <BlocksView />}
-
-          {activeTab === 'vendors' && (
-            <VendorsView onOpenAddAssetModal={() => setIsAddAssetOpen(true)} />
-          )}
 
           {activeTab === 'disposal' && (
             <AssetManagementView
