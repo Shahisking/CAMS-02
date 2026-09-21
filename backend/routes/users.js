@@ -2,7 +2,7 @@
 const express = require('express');
 const { getDB } = require('../config/db');
 const { verifyToken, requireRole } = require('../middleware/authMiddleware');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const router = express.Router();
 
 const ROLE_MAP = { 'System Monitor': 'Monitor' };

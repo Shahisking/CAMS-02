@@ -15,102 +15,94 @@ import { useApp } from '../../context/AppContext';
 import { Department } from '../../types';
 
 interface DepartmentCardInfo {
-  name: Department;
+  name: string;
   code: string;
   hod: string;
+  designation: string;
+  specialization: string;
   building: string;
   roomCount: number;
   contactEmail: string;
+  aliases?: string[];
 }
 
 const DEPARTMENTS_DATA: DepartmentCardInfo[] = [
   {
-    name: 'Computer Science & Engineering',
-    code: 'CSE',
-    hod: 'Dr. R. Sundaram',
-    building: 'Ramanujan Block',
-    roomCount: 12,
-    contactEmail: 'hod.cse@adithyatech.edu.in',
-  },
-  {
-    name: 'Information Technology',
-    code: 'IT',
-    hod: 'Dr. M. Kavitha',
-    building: 'Ramanujan Block',
-    roomCount: 8,
-    contactEmail: 'hod.it@adithyatech.edu.in',
-  },
-  {
-    name: 'Electronics & Communication',
-    code: 'ECE',
-    hod: 'Dr. K. Arulmozhi',
-    building: 'APJ Abdul Kalam Block',
-    roomCount: 10,
-    contactEmail: 'hod.ece@adithyatech.edu.in',
-  },
-  {
-    name: 'Electrical & Electronics',
-    code: 'EEE',
-    hod: 'Dr. P. Rajasekar',
-    building: 'APJ Abdul Kalam Block',
-    roomCount: 7,
-    contactEmail: 'hod.eee@adithyatech.edu.in',
-  },
-  {
-    name: 'Mechanical Engineering',
+    name: 'Mechanical Engineering Department',
     code: 'MECH',
-    hod: 'Dr. S. Karthikeyan',
+    hod: 'Dr.M.Selvakumar M.E., Ph.D.,',
+    designation: 'Professor & Head',
+    specialization: 'CAD/CAM',
     building: 'Sir M Visvesvaraya Block',
     roomCount: 14,
-    contactEmail: 'hod.mech@adithyatech.edu.in',
+    contactEmail: 'selvakumar_m@adithaytech.com',
+    aliases: ['Mechanical Engineering'],
   },
   {
-    name: 'Civil Engineering',
-    code: 'CIVIL',
-    hod: 'Dr. N. Murugesan',
-    building: 'Sir M Visvesvaraya Block',
-    roomCount: 9,
-    contactEmail: 'hod.civil@adithyatech.edu.in',
+    name: 'Electrical and Electronics Engineering Department',
+    code: 'EEE',
+    hod: 'Dr.B.Padmanabhan M.E.,M.B.A.,Ph.D.,',
+    designation: 'Associate Professor & HOD',
+    specialization: 'Power Systems Engg',
+    building: 'APJ Abdul Kalam Block',
+    roomCount: 7,
+    contactEmail: 'padmanabhan_b@adithyatech.com',
+    aliases: ['Electrical and Electronics Engineering', 'Electrical & Electronics'],
   },
   {
-    name: 'Artificial Intelligence & Data Science',
-    code: 'AI&DS',
-    hod: 'Dr. V. Deepa',
+    name: 'Electronics and Communication Engineering Department',
+    code: 'ECE',
+    hod: 'Dr.Sridevi M.E, Ph.D',
+    designation: 'Professor & HOD',
+    specialization: 'VLSI Design',
+    building: 'APJ Abdul Kalam Block',
+    roomCount: 10,
+    contactEmail: 'sridevi_a@adithyatech.com',
+    aliases: ['Electronics and Communication Engineering', 'Electronics & Communication'],
+  },
+  {
+    name: 'Artificial Intelligence and Data Science Department',
+    code: 'AI & DS',
+    hod: 'Mrs.G.Nithya M.E, (Ph.D )',
+    designation: 'Assistant Professor & HoD I/C',
+    specialization: 'Computer & Communication',
     building: 'Ramanujan Block',
     roomCount: 6,
-    contactEmail: 'hod.aids@adithyatech.edu.in',
+    contactEmail: 'nithya_g@adithyatech.com',
+    aliases: ['Artificial Intelligence and Data Science', 'Artificial Intelligence & Data Science'],
   },
   {
-    name: 'Administrative Office',
-    code: 'ADMIN',
-    hod: 'Mr. G. Ravichandran (Registrar)',
-    building: 'Main Administrative Building',
-    roomCount: 15,
-    contactEmail: 'admin@adithyatech.edu.in',
+    name: 'Information Technology Department',
+    code: 'IT',
+    hod: 'Dr.Mishmala Sushith B.E.,M.E.,PhD',
+    designation: 'Professor & HOD',
+    specialization: 'Image Processing, Networking, IoT, Cyber Security',
+    building: 'Ramanujan Block',
+    roomCount: 8,
+    contactEmail: 'mishmalasushith_d@adithyatech.com',
+    aliases: ['Information Technology'],
   },
   {
-    name: 'Central Library',
-    code: 'LIB',
-    hod: 'Dr. S. Meenakshi (Librarian)',
-    building: 'Central Library Building',
-    roomCount: 5,
-    contactEmail: 'library@adithyatech.edu.in',
+    name: 'Science & Humanities Department',
+    code: 'S&H',
+    hod: 'Dr.K.S.Ramesh M.Sc.M.Phil.,Ph.D.,',
+    designation: 'Professor & Head',
+    specialization: 'Solid State Chemistry',
+    building: 'Sir M Visvesvaraya Block',
+    roomCount: 8,
+    contactEmail: 'ramesh_s@adithyatech.com',
+    aliases: ['Science & Humanities', 'Science and Humanities'],
   },
   {
-    name: 'Hostel Management',
-    code: 'HOSTEL',
-    hod: 'Prof. T. Selvam (Warden)',
-    building: 'Boys Hostel Block A',
-    roomCount: 120,
-    contactEmail: 'hostel@adithyatech.edu.in',
-  },
-  {
-    name: 'Physical Education',
-    code: 'SPORTS',
-    hod: 'Dr. C. Ramesh (PED)',
-    building: 'Indoor Sports Complex',
-    roomCount: 4,
-    contactEmail: 'sports@adithyatech.edu.in',
+    name: 'Civil Engineering Department',
+    code: 'CIVIL',
+    hod: 'Dr.R.Anuradha Ph.D.,',
+    designation: 'Professor & Head, COE',
+    specialization: 'Structural Engineering',
+    building: 'Sir M Visvesvaraya Block',
+    roomCount: 9,
+    contactEmail: 'anuradha_r@adithyatech.com',
+    aliases: ['Civil Engineering'],
   },
 ];
 
@@ -128,11 +120,23 @@ export const DepartmentsView: React.FC<DepartmentsViewProps> = ({ onOpenAddAsset
       d.name.toLowerCase().includes(search.toLowerCase()) ||
       d.code.toLowerCase().includes(search.toLowerCase()) ||
       d.hod.toLowerCase().includes(search.toLowerCase()) ||
+      d.designation.toLowerCase().includes(search.toLowerCase()) ||
+      d.specialization.toLowerCase().includes(search.toLowerCase()) ||
+      d.contactEmail.toLowerCase().includes(search.toLowerCase()) ||
       d.building.toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleSelectDepartment = (deptName: Department) => {
-    setSelectedDepartmentFilter(deptName);
+  const handleSelectDepartment = (deptName: string) => {
+    const cleanName = deptName.replace(/\s+Department$/i, '').trim();
+    const mapped: Record<string, Department> = {
+      'Mechanical Engineering': 'Mechanical Engineering',
+      'Electrical and Electronics Engineering': 'Electrical & Electronics',
+      'Electronics and Communication Engineering': 'Electronics & Communication',
+      'Artificial Intelligence and Data Science': 'Artificial Intelligence & Data Science',
+      'Information Technology': 'Information Technology',
+      'Civil Engineering': 'Civil Engineering',
+    };
+    setSelectedDepartmentFilter(mapped[cleanName] || (cleanName as Department));
     setActiveTab('assets');
   };
 
@@ -142,7 +146,7 @@ export const DepartmentsView: React.FC<DepartmentsViewProps> = ({ onOpenAddAsset
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#EFF6FF] text-[#2563EB] text-xs font-semibold mb-2">
-            <Building2 className="w-3.5 h-3.5" /> 11 Academic & Administrative Units
+            <Building2 className="w-3.5 h-3.5" /> 7 Academic Departments
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-[#111827]">
             College Departments
@@ -177,7 +181,14 @@ export const DepartmentsView: React.FC<DepartmentsViewProps> = ({ onOpenAddAsset
       {/* Grid of Department Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredDepts.map((dept, i) => {
-          const deptAssets = assets.filter((a) => a.department === dept.name);
+          const deptAssets = assets.filter((a) => {
+            if (!a.department) return false;
+            if (a.department === dept.name) return true;
+            const cleanName = dept.name.replace(/\s+Department$/i, '').trim();
+            if (a.department === cleanName) return true;
+            if (dept.aliases && dept.aliases.some((alias) => alias.toLowerCase() === a.department.toLowerCase())) return true;
+            return false;
+          });
           const totalCount = deptAssets.length;
           const activeCount = deptAssets.filter((a) => a.status === 'Active' || a.status === 'In Use').length;
           const maintenanceCount = deptAssets.filter((a) => a.status === 'Under Maintenance').length;
@@ -209,14 +220,22 @@ export const DepartmentsView: React.FC<DepartmentsViewProps> = ({ onOpenAddAsset
                 </div>
 
                 {/* HOD Info */}
-                <div className="p-3 bg-[#F8FAFC] rounded-xl border border-[#E5E7EB]/60 my-4 space-y-1">
-                  <div className="text-xs font-semibold text-[#374151] flex items-center justify-between">
-                    <span className="text-[#6B7280]">Head of Dept:</span>
-                    <span className="text-[#111827] font-medium">{dept.hod}</span>
+                <div className="p-3 bg-[#F8FAFC] rounded-xl border border-[#E5E7EB]/60 my-4 space-y-1.5">
+                  <div className="text-xs font-semibold text-[#374151] flex items-center justify-between gap-2">
+                    <span className="text-[#6B7280] shrink-0">Head of Dept:</span>
+                    <span className="text-[#111827] font-medium text-right">{dept.hod}</span>
                   </div>
-                  <div className="text-xs text-[#6B7280] flex items-center justify-between">
-                    <span>Contact:</span>
-                    <span className="text-[#2563EB] text-[11px] font-mono">{dept.contactEmail}</span>
+                  <div className="text-xs text-[#374151] flex items-center justify-between gap-2">
+                    <span className="text-[#6B7280] shrink-0">Designation:</span>
+                    <span className="text-[#111827] font-medium text-right">{dept.designation}</span>
+                  </div>
+                  <div className="text-xs text-[#374151] flex items-center justify-between gap-2">
+                    <span className="text-[#6B7280] shrink-0">Specialization:</span>
+                    <span className="text-[#111827] font-medium text-right text-[11.5px] leading-tight">{dept.specialization}</span>
+                  </div>
+                  <div className="text-xs text-[#6B7280] flex items-center justify-between gap-2 pt-0.5">
+                    <span className="shrink-0">Contact:</span>
+                    <span className="text-[#2563EB] text-[11px] font-mono text-right truncate" title={dept.contactEmail}>{dept.contactEmail}</span>
                   </div>
                 </div>
 

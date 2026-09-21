@@ -95,7 +95,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Sidebar Navigation */}
       <aside
-        className={`fixed lg:sticky top-0 left-0 z-40 h-full min-h-0 bg-white dark:bg-slate-900 border-r border-slate-200/80 dark:border-slate-800 transition-all duration-300 flex flex-col overflow-hidden ${
+        id="sidebar-container"
+        style={{ height: '100vh', overflowY: 'auto' }}
+        className={`fixed lg:sticky top-0 left-0 z-40 h-[100vh] max-h-[100vh] bg-white dark:bg-slate-900 border-r border-slate-200/80 dark:border-slate-800 transition-all duration-300 flex flex-col overflow-y-auto overflow-x-hidden scrollbar-hide ${
           isCollapsed ? 'w-20' : 'w-64'
         } ${
           isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
@@ -169,7 +171,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
         )}
 
         {/* Navigation Items - Scrollable Area */}
-        <nav className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-2 space-y-1 scrollbar-hide">
+        <nav
+          className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-contain p-2 space-y-1 scrollbar-hide"
+          style={{ overflowY: 'auto', overflowX: 'hidden' }}
+        >
           {navItems.map((item) => {
             if (item.roles && (!currentUser || !item.roles.includes(currentUser.role))) {
               return null;

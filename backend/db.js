@@ -1,13 +1,7 @@
 // backend/db.js
-const { Pool } = require('pg');
-require('dotenv').config({ path: require('path').join(__dirname, '.env') });
-
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }
-});
+const { getDB } = require('./config/db');
 
 module.exports = {
-  query: (text, params) => pool.query(text, params),
-  getClient: () => pool.connect()
+  query: (text, params) => getDB().query(text, params),
+  getClient: () => getDB().connect()
 };

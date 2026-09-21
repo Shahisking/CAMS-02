@@ -2,7 +2,7 @@
 // Full schema init + seed using PostgreSQL (Neon)
 require('dotenv').config({ path: require('path').join(__dirname, '../.env') });
 const { Pool } = require('pg');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 const SALT_ROUNDS = 10;
 
