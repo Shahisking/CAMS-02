@@ -106,12 +106,21 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onClose, isModal = false }
           backgroundRepeat: 'no-repeat',
         }}
       />
-      
-      {/* Dark blue gradient overlay for readability without image blur */}
+
+      {/* Subtle transparent blue glassmorphism wash — background stays clearly visible */}
       <div
         className="absolute inset-0 -z-0 pointer-events-none"
         style={{
-          background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.55) 0%, rgba(15, 23, 42, 0.45) 40%, rgba(15, 23, 42, 0.35) 70%, rgba(15, 23, 42, 0.50) 100%)',
+          background:
+            'linear-gradient(120deg, rgba(37,99,235,0.30) 0%, rgba(56,189,248,0.14) 42%, rgba(29,78,216,0.26) 78%, rgba(14,116,144,0.16) 100%)',
+        }}
+      />
+      {/* Soft frosted sheen */}
+      <div
+        className="absolute inset-0 -z-0 pointer-events-none"
+        style={{
+          background:
+            'radial-gradient(ellipse 70% 55% at 50% 42%, rgba(255,255,255,0.12) 0%, rgba(186,230,253,0.07) 38%, transparent 70%)',
         }}
       />
 
@@ -119,7 +128,14 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onClose, isModal = false }
       {isModal && onClose && (
         <button
           onClick={onClose}
-          className="absolute top-6 right-6 z-50 p-2.5 bg-white/90 hover:bg-white rounded-full text-[#0F172A] shadow-lg transition-all cursor-pointer"
+          className="absolute top-6 right-6 z-50 p-2.5 rounded-full text-white transition-all cursor-pointer"
+          style={{
+            background: 'rgba(255,255,255,0.16)',
+            backdropFilter: 'blur(14px)',
+            WebkitBackdropFilter: 'blur(14px)',
+            border: '1px solid rgba(255,255,255,0.4)',
+            boxShadow: '0 8px 24px rgba(37,99,235,0.25)',
+          }}
         >
           <X className="w-5 h-5" />
         </button>
@@ -127,45 +143,67 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onClose, isModal = false }
 
       {/* Main Viewport Container - Desktop Layout with Right-aligned Card */}
       <div className="relative z-10 flex-1 flex items-center justify-center lg:justify-end max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-12 my-auto">
-        
+
         {/* Left Branding Text (Desktop Only) */}
-        <div className="hidden lg:flex flex-col text-white max-w-lg mr-auto pr-8 space-y-4 drop-shadow-md">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white text-xs font-semibold w-fit">
-            <Shield className="w-4 h-4 text-blue-300" />
+        <div className="hidden lg:flex flex-col text-white max-w-lg mr-auto pr-8 space-y-4">
+          <div
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-white text-xs font-semibold w-fit"
+            style={{
+              background: 'rgba(255,255,255,0.14)',
+              backdropFilter: 'blur(14px) saturate(160%)',
+              WebkitBackdropFilter: 'blur(14px) saturate(160%)',
+              border: '1px solid rgba(255,255,255,0.38)',
+              boxShadow: '0 8px 24px rgba(37,99,235,0.22), inset 0 1px 0 rgba(255,255,255,0.35)',
+            }}
+          >
+            <Shield className="w-4 h-4 text-sky-100" />
             <span>Official Institutional Portal</span>
           </div>
-          <h1 className="text-4xl xl:text-5xl font-extrabold tracking-tight text-white leading-tight font-sans">
+          <h1 className="text-4xl xl:text-5xl font-extrabold tracking-tight text-white leading-tight font-sans drop-shadow-[0_2px_14px_rgba(30,64,175,0.5)]">
             Adithya Institute of Technology
           </h1>
-          <p className="text-lg text-slate-100 font-medium">
+          <p className="text-lg text-sky-50 font-medium drop-shadow">
             College Asset Management System (CAMS)
           </p>
-          <p className="text-sm text-slate-200/90 leading-relaxed font-normal pt-2">
+          <p className="text-sm text-sky-50/85 leading-relaxed font-normal pt-2">
             Centralized intelligent asset tracking, inventory management, maintenance scheduling, and institutional compliance monitoring.
           </p>
         </div>
 
-        {/* Right-aligned Login Card (Exact Specs) */}
+        {/* Right-aligned Login Card — premium frosted glass */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, ease: 'easeOut' }}
-          className="w-full max-w-[430px] rounded-[20px] p-[28px] sm:p-[40px] border border-[#E2E8F0] shadow-[0_20px_50px_rgba(15,23,42,0.18)] relative backdrop-blur-[8px]"
+          className="w-full max-w-[430px] rounded-[20px] p-[28px] sm:p-[40px] relative"
           style={{
-            backgroundColor: 'rgba(255, 255, 255, 0.96)',
+            background:
+              'linear-gradient(135deg, rgba(255,255,255,0.22) 0%, rgba(186,230,253,0.13) 50%, rgba(37,99,235,0.18) 100%)',
+            backdropFilter: 'blur(22px) saturate(170%)',
+            WebkitBackdropFilter: 'blur(22px) saturate(170%)',
+            border: '1px solid rgba(255,255,255,0.45)',
+            boxShadow:
+              '0 24px 64px rgba(30,64,175,0.32), 0 0 48px rgba(56,189,248,0.22), inset 0 1px 0 rgba(255,255,255,0.5)',
           }}
         >
           {/* Top Header: Logo + Theme Toggle */}
           <div className="flex items-start justify-between mb-6">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center p-1.5 shrink-0 shadow-2xs">
+              <div
+                className="w-12 h-12 rounded-xl flex items-center justify-center p-1.5 shrink-0"
+                style={{
+                  background: 'rgba(255,255,255,0.25)',
+                  border: '1px solid rgba(255,255,255,0.5)',
+                  boxShadow: '0 6px 18px rgba(30,64,175,0.25), inset 0 1px 0 rgba(255,255,255,0.5)',
+                }}
+              >
                 <CollegeLogo size="md" variant="icon-only" />
               </div>
               <div>
-                <h3 className="text-xs font-bold text-[#0F172A] tracking-tight leading-snug">
+                <h3 className="text-xs font-bold text-white tracking-tight leading-snug drop-shadow">
                   Adithya Institute of Technology
                 </h3>
-                <p className="text-[11px] font-semibold text-[#64748B]">
+                <p className="text-[11px] font-semibold text-sky-100/90">
                   College Asset Management System (CAMS)
                 </p>
               </div>
@@ -178,31 +216,45 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onClose, isModal = false }
                 e.stopPropagation();
                 toggleDarkMode();
               }}
-              className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-[#0F172A] text-xs font-medium border border-slate-200 transition-all cursor-pointer shrink-0 active:scale-95"
+              className="p-2 rounded-xl text-white text-xs font-medium transition-all cursor-pointer shrink-0 active:scale-95"
+              style={{
+                background: 'rgba(255,255,255,0.14)',
+                border: '1px solid rgba(255,255,255,0.35)',
+                backdropFilter: 'blur(10px)',
+                WebkitBackdropFilter: 'blur(10px)',
+              }}
               title={isDarkMode ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
             >
               {isDarkMode ? (
-                <Sun className="w-4 h-4 text-amber-500 pointer-events-none" />
+                <Sun className="w-4 h-4 text-amber-200 pointer-events-none" />
               ) : (
-                <Moon className="w-4 h-4 text-slate-700 pointer-events-none" />
+                <Moon className="w-4 h-4 text-sky-100 pointer-events-none" />
               )}
             </button>
           </div>
 
           {/* Heading & Subtitle */}
           <div className="mb-6">
-            <h2 className="text-[26px] font-extrabold text-[#0F172A] tracking-tight leading-none font-sans">
+            <h2 className="text-[26px] font-extrabold text-white tracking-tight leading-none font-sans drop-shadow">
               Sign In
             </h2>
-            <p className="text-[13px] text-[#64748B] mt-1.5 font-medium">
+            <p className="text-[13px] text-sky-100/85 mt-1.5 font-medium">
               Authorized Personnel Only
             </p>
           </div>
 
           {/* Error Banner */}
           {errorMsg && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 text-xs font-medium rounded-xl flex items-center gap-2">
-              <X className="w-4 h-4 shrink-0 text-red-600" />
+            <div
+              className="mb-4 p-3 text-rose-50 text-xs font-medium rounded-xl flex items-center gap-2"
+              style={{
+                background: 'rgba(244,63,94,0.22)',
+                border: '1px solid rgba(255,255,255,0.35)',
+                backdropFilter: 'blur(10px)',
+                WebkitBackdropFilter: 'blur(10px)',
+              }}
+            >
+              <X className="w-4 h-4 shrink-0 text-rose-100" />
               <span>{errorMsg}</span>
             </div>
           )}
@@ -211,14 +263,21 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onClose, isModal = false }
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Role Select */}
             <div>
-              <label className="block text-xs font-bold text-[#0F172A] mb-1.5">
+              <label className="block text-xs font-bold text-white mb-1.5 drop-shadow">
                 User Role
               </label>
               <div className="relative">
                 <select
                   value={role}
                   onChange={(e) => handleRoleChange(e.target.value as Role)}
-                  className="w-full h-[50px] bg-white border border-[#CBD5E1] hover:border-[#94A3B8] text-[#0F172A] text-sm rounded-[14px] px-3.5 outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20 appearance-none font-medium cursor-pointer transition-all"
+                  className="w-full h-[50px] text-white text-sm rounded-[14px] px-3.5 outline-none appearance-none font-medium cursor-pointer transition-all"
+                  style={{
+                    background: 'rgba(255,255,255,0.12)',
+                    border: '1px solid rgba(255,255,255,0.38)',
+                    backdropFilter: 'blur(10px)',
+                    WebkitBackdropFilter: 'blur(10px)',
+                    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.25)',
+                  }}
                 >
                   {rolesList.map((r) => (
                     <option key={r.role} value={r.role} className="bg-white text-[#0F172A]">
@@ -226,13 +285,13 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onClose, isModal = false }
                     </option>
                   ))}
                 </select>
-                <ChevronDown className="w-4 h-4 absolute right-3.5 top-1/2 -translate-y-1/2 text-[#94A3B8] pointer-events-none" />
+                <ChevronDown className="w-4 h-4 absolute right-3.5 top-1/2 -translate-y-1/2 text-sky-100/80 pointer-events-none" />
               </div>
             </div>
 
             {/* Email Address */}
             <div>
-              <label className="block text-xs font-bold text-[#0F172A] mb-1.5">
+              <label className="block text-xs font-bold text-white mb-1.5 drop-shadow">
                 Email Address
               </label>
               <input
@@ -240,14 +299,21 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onClose, isModal = false }
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="principal@ait.edu.in"
-                className="w-full h-[50px] bg-white border border-[#CBD5E1] hover:border-[#94A3B8] text-[#0F172A] placeholder-[#94A3B8] text-sm rounded-[14px] px-3.5 outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20 font-medium transition-all"
+                className="w-full h-[50px] text-white placeholder-sky-100/50 text-sm rounded-[14px] px-3.5 outline-none font-medium transition-all"
+                style={{
+                  background: 'rgba(255,255,255,0.12)',
+                  border: '1px solid rgba(255,255,255,0.38)',
+                  backdropFilter: 'blur(10px)',
+                  WebkitBackdropFilter: 'blur(10px)',
+                  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.25)',
+                }}
                 required
               />
             </div>
 
             {/* Password */}
             <div>
-              <label className="block text-xs font-bold text-[#0F172A] mb-1.5">
+              <label className="block text-xs font-bold text-white mb-1.5 drop-shadow">
                 Password
               </label>
               <div className="relative">
@@ -256,13 +322,20 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onClose, isModal = false }
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
-                  className="w-full h-[50px] bg-white border border-[#CBD5E1] hover:border-[#94A3B8] text-[#0F172A] placeholder-[#94A3B8] text-sm rounded-[14px] pl-3.5 pr-10 outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20 font-medium transition-all"
+                  className="w-full h-[50px] text-white placeholder-sky-100/50 text-sm rounded-[14px] pl-3.5 pr-10 outline-none font-medium transition-all"
+                  style={{
+                    background: 'rgba(255,255,255,0.12)',
+                    border: '1px solid rgba(255,255,255,0.38)',
+                    backdropFilter: 'blur(10px)',
+                    WebkitBackdropFilter: 'blur(10px)',
+                    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.25)',
+                  }}
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#94A3B8] hover:text-[#0F172A] transition-colors p-1"
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-sky-100/80 hover:text-white transition-colors p-1"
                   title={showPassword ? 'Hide Password' : 'Show Password'}
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -272,19 +345,19 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onClose, isModal = false }
 
             {/* Remember Me & Forgot Password */}
             <div className="flex items-center justify-between text-xs pt-1">
-              <label className="flex items-center gap-2 cursor-pointer font-medium text-[#475569] select-none">
+              <label className="flex items-center gap-2 cursor-pointer font-medium text-sky-50 select-none">
                 <input
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="w-4 h-4 rounded border-[#CBD5E1] text-[#2563EB] focus:ring-[#2563EB] cursor-pointer"
+                  className="w-4 h-4 rounded border-white/40 text-[#2563EB] focus:ring-sky-300 cursor-pointer"
                 />
                 <span>Remember Me</span>
               </label>
               <button
                 type="button"
                 onClick={() => setForgotModalOpen(true)}
-                className="text-[#2563EB] font-bold hover:underline cursor-pointer"
+                className="text-white font-bold hover:underline cursor-pointer drop-shadow"
               >
                 Forgot Password?
               </button>
@@ -294,7 +367,15 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onClose, isModal = false }
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full h-[54px] bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold rounded-[14px] text-base shadow-md shadow-blue-500/20 flex items-center justify-center gap-2 transition-all duration-200 cursor-pointer disabled:opacity-75 disabled:pointer-events-none mt-2"
+              className="w-full h-[54px] text-white font-bold rounded-[14px] text-base flex items-center justify-center gap-2 transition-all duration-200 cursor-pointer disabled:opacity-75 disabled:pointer-events-none mt-2"
+              style={{
+                background: 'linear-gradient(135deg, rgba(37,99,235,0.85), rgba(14,165,233,0.85))',
+                border: '1px solid rgba(255,255,255,0.45)',
+                boxShadow:
+                  '0 12px 32px rgba(37,99,235,0.45), 0 0 24px rgba(56,189,248,0.35), inset 0 1px 0 rgba(255,255,255,0.4)',
+                backdropFilter: 'blur(10px)',
+                WebkitBackdropFilter: 'blur(10px)',
+              }}
             >
               {isLoading ? (
                 <>
@@ -316,34 +397,53 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onClose, isModal = false }
       </div>
 
       {/* Footer */}
-      <footer className="relative z-10 py-3 text-center text-xs font-medium text-slate-200 bg-slate-900/80 backdrop-blur-sm border-t border-slate-800">
+      <footer
+        className="relative z-10 py-3 text-center text-xs font-medium text-sky-50"
+        style={{
+          background: 'rgba(30,64,175,0.22)',
+          backdropFilter: 'blur(16px) saturate(160%)',
+          WebkitBackdropFilter: 'blur(16px) saturate(160%)',
+          borderTop: '1px solid rgba(255,255,255,0.28)',
+        }}
+      >
         Copyright © Adithya Institute of Technology. All rights reserved.
       </footer>
 
       {/* Forgot Password Modal */}
       {forgotModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-blue-900/30 flex items-center justify-center p-4" style={{ backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }}>
           <motion.div
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="bg-white border border-[#E2E8F0] p-6 rounded-[20px] max-w-sm w-full relative shadow-2xl"
+            className="p-6 rounded-[20px] max-w-sm w-full relative"
+            style={{
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.24), rgba(186,230,253,0.14))',
+              backdropFilter: 'blur(22px) saturate(170%)',
+              WebkitBackdropFilter: 'blur(22px) saturate(170%)',
+              border: '1px solid rgba(255,255,255,0.45)',
+              boxShadow: '0 24px 64px rgba(30,64,175,0.35), inset 0 1px 0 rgba(255,255,255,0.5)',
+            }}
           >
             <button
               onClick={() => setForgotModalOpen(false)}
-              className="absolute top-4 right-4 text-[#94A3B8] hover:text-[#0F172A] p-1 rounded-full hover:bg-slate-100 transition-colors cursor-pointer"
+              className="absolute top-4 right-4 text-sky-100 hover:text-white p-1 rounded-full transition-colors cursor-pointer"
+              style={{ background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.3)' }}
             >
               <X className="w-5 h-5" />
             </button>
-            <h3 className="text-lg font-bold text-[#0F172A] mb-1">
+            <h3 className="text-lg font-bold text-white mb-1">
               Reset Password
             </h3>
-            <p className="text-xs text-[#64748B] mb-4">
+            <p className="text-xs text-sky-100/85 mb-4">
               Enter your official college email to receive password reset instructions.
             </p>
 
             {forgotSuccess ? (
-              <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-600 rounded-xl text-xs font-medium flex items-center gap-2">
-                <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+              <div
+                className="p-3 text-emerald-50 rounded-xl text-xs font-medium flex items-center gap-2"
+                style={{ background: 'rgba(16,185,129,0.25)', border: '1px solid rgba(255,255,255,0.35)' }}
+              >
+                <Check className="w-4 h-4 text-emerald-100 shrink-0" />
                 <span>Password reset link sent to your email inbox!</span>
               </div>
             ) : (
@@ -353,12 +453,23 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onClose, isModal = false }
                   value={forgotEmail}
                   onChange={(e) => setForgotEmail(e.target.value)}
                   placeholder="principal@ait.edu.in"
-                  className="w-full h-[46px] bg-white border border-[#CBD5E1] text-[#0F172A] text-xs rounded-[12px] px-3.5 outline-none focus:border-[#2563EB]"
+                  className="w-full h-[46px] text-white placeholder-sky-100/50 text-xs rounded-[12px] px-3.5 outline-none"
+                  style={{
+                    background: 'rgba(255,255,255,0.12)',
+                    border: '1px solid rgba(255,255,255,0.38)',
+                    backdropFilter: 'blur(10px)',
+                    WebkitBackdropFilter: 'blur(10px)',
+                  }}
                   required
                 />
                 <button
                   type="submit"
-                  className="w-full h-[46px] bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold rounded-[12px] text-xs transition-all cursor-pointer"
+                  className="w-full h-[46px] text-white font-bold rounded-[12px] text-xs transition-all cursor-pointer"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(37,99,235,0.85), rgba(14,165,233,0.85))',
+                    border: '1px solid rgba(255,255,255,0.45)',
+                    boxShadow: '0 8px 24px rgba(37,99,235,0.4)',
+                  }}
                 >
                   Send Reset Link
                 </button>
@@ -370,5 +481,4 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onClose, isModal = false }
     </div>
   );
 };
-
 
