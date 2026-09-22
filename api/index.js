@@ -4,18 +4,34 @@
 // the API via the relative base URL '/api' (never a localhost URL).
 //
 // NOTE: root package.json has "type": "module", so this file is ESM.
-// Backend route modules are CommonJS and are loaded via createRequire.
-import { createRequire } from 'module';
+// Backend route modules are CommonJS and are imported as ESM defaults.
+//
+// IMPORTANT: this entry MUST stay statically importable and avoid
+// createRequire(import.meta.url) — Vercel's @vercel/node builder bundles the
+// function to CommonJS with esbuild, where `import.meta` is empty and the
+// module would crash at load (ERR_INVALID_ARG_VALUE), making every /api/* call
+// (including login) return 500. Static imports bundle cleanly in both modes.
 import { pathToFileURL } from 'url';
 import express from 'express';
 import cors from 'cors';
 
-const require = createRequire(import.meta.url);
-
 // Shared Neon pool from backend/config/db.js.
 // Locally it loads backend/.env; on Vercel it uses environment variables.
 // It has NO mock-database fallback — auth always hits the real database.
-const { getDB, connectDB } = require('../backend/config/db');
+import db from '../backend/config/db.js';
+import authRoutes from '../backend/routes/auth.js';
+import assetRoutes from '../backend/routes/assets.js';
+import allocationRoutes from '../backend/routes/allocations.js';
+import historyRoutes from '../backend/routes/history.js';
+import notificationRoutes from '../backend/routes/notifications.js';
+import userRoutes from '../backend/routes/users.js';
+import blockRoutes from '../backend/routes/blocks.js';
+import roomRoutes from '../backend/routes/rooms.js';
+import requestRoutes from '../backend/routes/requests.js';
+import vendorRoutes from '../backend/routes/vendors.js';
+import maintenanceRoutes from '../backend/routes/maintenance.js';
+
+const { getDB, connectDB } = db;
 const pool = getDB();
 connectDB();
 
@@ -134,17 +150,17 @@ app.get('/api/system/stats', async (req, res) => {
 });
 
 // ─── API Routes ──────────────────────────────────────────────────────────────
-app.use('/api/auth',          require('../backend/routes/auth'));
-app.use('/api/assets',        require('../backend/routes/assets'));
-app.use('/api/allocations',   require('../backend/routes/allocations'));
-app.use('/api/history',       require('../backend/routes/history'));
-app.use('/api/notifications', require('../backend/routes/notifications'));
-app.use('/api/users',         require('../backend/routes/users'));
-app.use('/api/blocks',        require('../backend/routes/blocks'));
-app.use('/api/rooms',         require('../backend/routes/rooms'));
-app.use('/api/requests',      require('../backend/routes/requests'));
-app.use('/api/vendors',       require('../backend/routes/vendors'));
-app.use('/api/maintenance',   require('../backend/routes/maintenance'));
+app.use('/api/auth',          authRoutes);
+app.use('/api/assets',        assetRoutes);
+app.use('/api/allocations',   allocationRoutes);
+app.use('/api/history',       historyRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/users',         userRoutes);
+app.use('/api/blocks',        blockRoutes);
+app.use('/api/rooms',         roomRoutes);
+app.use('/api/requests',      requestRoutes);
+app.use('/api/vendors',       vendorRoutes);
+app.use('/api/maintenance',   maintenanceRoutes);
 
 // ─── Global Error Handler ────────────────────────────────────────────────────
 app.use((err, req, res, next) => {
