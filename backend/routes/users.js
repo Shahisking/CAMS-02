@@ -55,14 +55,15 @@ router.post('/', verifyToken, requireRole(['Monitor', 'Admin']), async (req, res
     return res.status(400).json({ message: 'Email, password and role are required' });
 
   try {
-    const existing = (await getDB().query('SELECT id FROM users WHERE email = $1', [email])).rows;
+    const normalizedEmail = String(email).trim().toLowerCase();
+    const existing = (await getDB().query('SELECT id FROM users WHERE LOWER(email) = $1', [normalizedEmail])).rows;
     if (existing.length > 0)
       return res.status(409).json({ message: 'User already exists' });
 
     const hash = await bcrypt.hash(password, 10);
     const { rows } = await getDB().query(
       'INSERT INTO users (email, password_hash, name, role, department, staff_id, status) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
-      [email, hash, name || null, role, department || null, staffId || null, 'Active']
+      [normalizedEmail, hash, name || null, role, department || null, staffId || null, 'Active']
     );
 
     // Audit log: USER_REGISTERED (admin-created)

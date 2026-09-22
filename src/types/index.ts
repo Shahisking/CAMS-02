@@ -104,6 +104,16 @@ export type CategoryType =
 
 export type ChairType = 'Normal Chair' | 'Plastic Chair' | 'Cushion Chair' | 'Rolling Chair';
 
+export interface Category {
+  id: string;
+  name: string;
+  icon: string; // lucide-react icon name
+  description: string;
+  isCustom: boolean; // distinguish built-in vs user-created
+  createdAt: string;
+  updatedAt: string;
+}
+
 export type AssetCondition = 'New' | 'Good' | 'Fair' | 'Poor' | 'Damaged';
 
 export type AssetStatus = 'Active' | 'In Use' | 'Under Maintenance' | 'Damaged' | 'Lost' | 'Written Off';

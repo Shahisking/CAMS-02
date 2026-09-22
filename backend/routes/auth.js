@@ -63,9 +63,10 @@ router.post('/register', async (req, res) => {
     return res.status(400).json({ message: 'Missing required fields' });
   }
   const pool = getDB();
+  const normalizedEmail = String(email).trim().toLowerCase();
   try {
-    // Check for duplicate email
-    const emailCheck = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
+    // Check for duplicate email (case-insensitive)
+    const emailCheck = await pool.query('SELECT id FROM users WHERE LOWER(email) = $1', [normalizedEmail]);
     if (emailCheck.rowCount > 0) {
       return res.status(409).json({ message: 'Email already registered' });
     }
@@ -80,7 +81,7 @@ router.post('/register', async (req, res) => {
     const insertSql = `INSERT INTO users (name, email, password_hash, role, department, staff_id, status)
       VALUES ($1, $2, $3, $4, $5, $6, 'Active')
       RETURNING *`;
-    const { rows } = await pool.query(insertSql, [full_name, email, hashed, role, department || 'Administrative Office', staff_id || null]);
+    const { rows } = await pool.query(insertSql, [full_name, normalizedEmail, hashed, role, department || 'Administrative Office', staff_id || null]);
     const user = rows[0];
 
     // Audit log: USER_REGISTERED
@@ -108,23 +109,35 @@ router.post('/login', async (req, res) => {
     return res.status(400).json({ message: 'Email and password required' });
   }
   const pool = getDB();
+  const normalizedEmail = String(email).trim();
   try {
+    // Case-insensitive lookup so registration/login never disagree on case
     const { rows } = await pool.query(
-      'SELECT * FROM users WHERE email = $1',
-      [email]
+      'SELECT * FROM users WHERE LOWER(email) = LOWER($1)',
+      [normalizedEmail]
     );
     if (rows.length === 0) {
       // Log failed login attempt for unknown email
-      await insertLoginHistory(pool, { userId: null, email, status: 'FAILED' });
+      await insertLoginHistory(pool, { userId: null, email: normalizedEmail, status: 'FAILED' });
       await insertAuditLog(pool, {
-        userId: null, userEmail: email, role: '', department: '',
-        action: 'USER_LOGIN', details: `Failed login attempt — unknown email: ${email}`,
+        userId: null, userEmail: normalizedEmail, role: '', department: '',
+        action: 'USER_LOGIN', details: `Failed login attempt — unknown email: ${normalizedEmail}`,
         ipAddress: req.ip,
       });
       return res.status(401).json({ message: 'Invalid credentials' });
     }
     const user = rows[0];
-    const match = await bcrypt.compare(password, user.password_hash);
+    if (!user.password_hash) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+    // Secure verification: bcrypt/argon2-style compare — never re-hash and
+    // compare strings directly.
+    let match = false;
+    try {
+      match = await bcrypt.compare(password, user.password_hash);
+    } catch {
+      match = false; // malformed stored hash → treat as invalid password
+    }
     if (!match) {
       // Log failed login attempt
       await insertLoginHistory(pool, { userId: user.id, email, status: 'FAILED' });

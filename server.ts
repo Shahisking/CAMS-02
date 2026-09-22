@@ -5,8 +5,50 @@ import cors from 'cors';
 import { createServer as createViteServer } from 'vite';
 import { createRequire } from 'module';
 
-const require = createRequire(import.meta.url);
+// Resolve backend CJS modules from the project root (works under tsx dev
+// and the bundled dist/server.cjs — import.meta.url is not available in CJS).
+const require = createRequire(path.join(process.cwd(), 'package.json'));
 const { connectDB, getDB } = require('./backend/config/db');
+
+// ─── Table Ensure Helpers ────────────────────────────────────────────────────
+async function ensureLoginHistoryTable(db: any) {
+  try {
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS login_history (
+        id          SERIAL PRIMARY KEY,
+        user_id     INTEGER,
+        email       VARCHAR(255),
+        login_time  TIMESTAMPTZ DEFAULT NOW(),
+        logout_time TIMESTAMPTZ,
+        status      VARCHAR(50) DEFAULT 'SUCCESS',
+        ip_address  VARCHAR(100)
+      );
+    `);
+    console.log('✅ Verified login_history table exists');
+  } catch (err: any) {
+    console.error('❌ Failed to ensure login_history table:', err.message);
+  }
+}
+
+async function ensureAssetHistoryTable(db: any) {
+  try {
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS asset_history (
+        id           SERIAL PRIMARY KEY,
+        asset_id     VARCHAR(50),
+        type         VARCHAR(100),
+        title        VARCHAR(255),
+        description  TEXT,
+        performed_by VARCHAR(255),
+        date         TIMESTAMPTZ DEFAULT NOW(),
+        cost         NUMERIC
+      );
+    `);
+    console.log('✅ Verified asset_history table exists');
+  } catch (err: any) {
+    console.error('❌ Failed to ensure asset_history table:', err.message);
+  }
+}
 
 async function startServer() {
   const app = express();
@@ -35,7 +77,7 @@ async function startServer() {
     const health: Record<string, any> = {
       status: 'ok',
       message: 'Backend is running',
-      db: 'PostgreSQL / In-Memory Mock',
+      db: 'PostgreSQL (Neon)',
       timestamp: new Date().toISOString(),
     };
 
@@ -103,6 +145,10 @@ async function startServer() {
 
   // Database initialization
   await connectDB();
+
+  // Ensure critical tables that may not be present in older migrations
+  await ensureLoginHistoryTable(getDB());
+  await ensureAssetHistoryTable(getDB());
 
   // Vite middleware for development or static serving for production
   if (process.env.NODE_ENV !== 'production') {

@@ -71,7 +71,7 @@ export const SystemMonitorView: React.FC = () => {
 
     // Backend API check
     try {
-      const apiRes = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/health`, {
+      const apiRes = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/health`, {
         signal: AbortSignal.timeout(5000),
       });
       if (apiRes.ok) {
@@ -100,7 +100,7 @@ export const SystemMonitorView: React.FC = () => {
 
     // Database check via auth endpoint (indirect DB check)
     try {
-      const dbRes = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/assets`, {
+      const dbRes = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/assets`, {
         signal: AbortSignal.timeout(5000),
       });
       if (dbRes.ok) {
@@ -129,7 +129,7 @@ export const SystemMonitorView: React.FC = () => {
 
     // Auth check
     try {
-      const authRes = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/health`, {
+      const authRes = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/health`, {
         signal: AbortSignal.timeout(5000),
       });
       if (authRes.ok) {

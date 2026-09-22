@@ -8,8 +8,6 @@ import {
   Eye,
   EyeOff,
   LogIn,
-  Moon,
-  Sun,
   Boxes,
   BarChart3,
   Shield,
@@ -28,7 +26,7 @@ interface LoginPageProps {
 }
 
 export const LoginPage: React.FC<LoginPageProps> = ({ onClose, isModal = false }) => {
-  const { login, isDarkMode, toggleDarkMode, setActiveTab } = useApp();
+  const { login, setActiveTab } = useApp();
 
   const [role, setRole] = useState<Role>('Admin');
   const [username, setUsername] = useState('');
@@ -37,9 +35,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onClose, isModal = false }
   const [rememberMe, setRememberMe] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
-  const [forgotModalOpen, setForgotModalOpen] = useState(false);
-  const [forgotEmail, setForgotEmail] = useState('');
-  const [forgotSuccess, setForgotSuccess] = useState(false);
 
   const rolesList: { role: Role; label: string }[] = [
     { role: 'Admin', label: 'Administrator' },
@@ -81,17 +76,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onClose, isModal = false }
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleForgotSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!forgotEmail) return;
-    setForgotSuccess(true);
-    setTimeout(() => {
-      setForgotSuccess(false);
-      setForgotModalOpen(false);
-      setForgotEmail('');
-    }, 2000);
   };
 
   return (
@@ -199,38 +183,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onClose, isModal = false }
               >
                 <CollegeLogo size="md" variant="icon-only" />
               </div>
-              <div>
-                <h3 className="text-xs font-bold text-white tracking-tight leading-snug drop-shadow">
-                  Adithya Institute of Technology
-                </h3>
-                <p className="text-[11px] font-semibold text-sky-100/90">
-                  College Asset Management System (CAMS)
-                </p>
-              </div>
             </div>
-
-            <button
-              type="button"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                toggleDarkMode();
-              }}
-              className="p-2 rounded-xl text-white text-xs font-medium transition-all cursor-pointer shrink-0 active:scale-95"
-              style={{
-                background: 'rgba(255,255,255,0.14)',
-                border: '1px solid rgba(255,255,255,0.35)',
-                backdropFilter: 'blur(10px)',
-                WebkitBackdropFilter: 'blur(10px)',
-              }}
-              title={isDarkMode ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
-            >
-              {isDarkMode ? (
-                <Sun className="w-4 h-4 text-amber-200 pointer-events-none" />
-              ) : (
-                <Moon className="w-4 h-4 text-sky-100 pointer-events-none" />
-              )}
-            </button>
           </div>
 
           {/* Heading & Subtitle */}
@@ -343,7 +296,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onClose, isModal = false }
               </div>
             </div>
 
-            {/* Remember Me & Forgot Password */}
+            {/* Remember Me */}
             <div className="flex items-center justify-between text-xs pt-1">
               <label className="flex items-center gap-2 cursor-pointer font-medium text-sky-50 select-none">
                 <input
@@ -354,13 +307,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onClose, isModal = false }
                 />
                 <span>Remember Me</span>
               </label>
-              <button
-                type="button"
-                onClick={() => setForgotModalOpen(true)}
-                className="text-white font-bold hover:underline cursor-pointer drop-shadow"
-              >
-                Forgot Password?
-              </button>
             </div>
 
             {/* Primary Sign In Button */}
@@ -408,76 +354,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onClose, isModal = false }
       >
         Copyright © Adithya Institute of Technology. All rights reserved.
       </footer>
-
-      {/* Forgot Password Modal */}
-      {forgotModalOpen && (
-        <div className="fixed inset-0 z-50 bg-blue-900/30 flex items-center justify-center p-4" style={{ backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }}>
-          <motion.div
-            initial={{ scale: 0.95, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="p-6 rounded-[20px] max-w-sm w-full relative"
-            style={{
-              background: 'linear-gradient(135deg, rgba(255,255,255,0.24), rgba(186,230,253,0.14))',
-              backdropFilter: 'blur(22px) saturate(170%)',
-              WebkitBackdropFilter: 'blur(22px) saturate(170%)',
-              border: '1px solid rgba(255,255,255,0.45)',
-              boxShadow: '0 24px 64px rgba(30,64,175,0.35), inset 0 1px 0 rgba(255,255,255,0.5)',
-            }}
-          >
-            <button
-              onClick={() => setForgotModalOpen(false)}
-              className="absolute top-4 right-4 text-sky-100 hover:text-white p-1 rounded-full transition-colors cursor-pointer"
-              style={{ background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.3)' }}
-            >
-              <X className="w-5 h-5" />
-            </button>
-            <h3 className="text-lg font-bold text-white mb-1">
-              Reset Password
-            </h3>
-            <p className="text-xs text-sky-100/85 mb-4">
-              Enter your official college email to receive password reset instructions.
-            </p>
-
-            {forgotSuccess ? (
-              <div
-                className="p-3 text-emerald-50 rounded-xl text-xs font-medium flex items-center gap-2"
-                style={{ background: 'rgba(16,185,129,0.25)', border: '1px solid rgba(255,255,255,0.35)' }}
-              >
-                <Check className="w-4 h-4 text-emerald-100 shrink-0" />
-                <span>Password reset link sent to your email inbox!</span>
-              </div>
-            ) : (
-              <form onSubmit={handleForgotSubmit} className="space-y-3">
-                <input
-                  type="email"
-                  value={forgotEmail}
-                  onChange={(e) => setForgotEmail(e.target.value)}
-                  placeholder="principal@ait.edu.in"
-                  className="w-full h-[46px] text-white placeholder-sky-100/50 text-xs rounded-[12px] px-3.5 outline-none"
-                  style={{
-                    background: 'rgba(255,255,255,0.12)',
-                    border: '1px solid rgba(255,255,255,0.38)',
-                    backdropFilter: 'blur(10px)',
-                    WebkitBackdropFilter: 'blur(10px)',
-                  }}
-                  required
-                />
-                <button
-                  type="submit"
-                  className="w-full h-[46px] text-white font-bold rounded-[12px] text-xs transition-all cursor-pointer"
-                  style={{
-                    background: 'linear-gradient(135deg, rgba(37,99,235,0.85), rgba(14,165,233,0.85))',
-                    border: '1px solid rgba(255,255,255,0.45)',
-                    boxShadow: '0 8px 24px rgba(37,99,235,0.4)',
-                  }}
-                >
-                  Send Reset Link
-                </button>
-              </form>
-            )}
-          </motion.div>
-        </div>
-      )}
     </div>
   );
 };

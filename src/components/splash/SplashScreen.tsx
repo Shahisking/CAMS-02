@@ -150,7 +150,7 @@ export const SplashScreen: React.FC = () => {
           <CollegeLogo size="sm" variant="icon-only" />
           <span className="flex flex-col leading-tight">
             <span className="text-xs font-semibold text-white tracking-wide uppercase drop-shadow">
-              Adithya College of Arts &amp; Science
+              Adithya Institute Of Technology
             </span>
             <span className="text-[10px] text-sky-100/90 tracking-widest">Coimbatore</span>
           </span>
@@ -360,7 +360,7 @@ export const SplashScreen: React.FC = () => {
           Campus Asset Management System
         </span>
         <span className="text-[10px] text-sky-100/70">
-          v1.0 &mdash; Adithya College of Arts &amp; Science
+          v1.0 &mdash; Adithya Institute Of Technology
         </span>
       </motion.div>
     </div>

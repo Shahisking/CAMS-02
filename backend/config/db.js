@@ -1,67 +1,50 @@
 // backend/config/db.js
+// ALWAYS uses the real Neon PostgreSQL database.
+// There is intentionally no mock/in-memory fallback here: authentication,
+// registration, and login-history must only ever touch the real database.
+const path = require('path');
 const { Pool } = require('pg');
-const { MockDatabase } = require('./mockDb');
+
+// Local/dev: load backend/.env (works regardless of process cwd).
+// Vercel: this file is not present in the deployment, so process.env
+// (Dashboard → Settings → Environment Variables) is used instead.
+require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
 require('dotenv').config();
 
-let poolInstance = null;
-let isMockActive = false;
-
-const mockDb = new MockDatabase();
-
-if (process.env.DATABASE_URL) {
-  try {
-    poolInstance = new Pool({
-      connectionString: process.env.DATABASE_URL,
-      ssl: {
-        rejectUnauthorized: false
-      }
-    });
-
-    poolInstance.on('error', (err) => {
-      console.warn('PostgreSQL idle client error, falling back to mock:', err.message);
-      isMockActive = true;
-    });
-  } catch (err) {
-    console.warn('Failed to initialize PostgreSQL pool, using mock:', err.message);
-    isMockActive = true;
-  }
-} else {
-  console.log('ℹ️ DATABASE_URL not provided — active mock database initialized.');
-  isMockActive = true;
+if (!process.env.DATABASE_URL) {
+  console.error(
+    '❌ DATABASE_URL is not set. Configure backend/.env for local dev, or Vercel → Settings → Environment Variables for production.'
+  );
 }
 
-async function connectDB() {
-  if (isMockActive || !poolInstance) {
-    console.log('✅ In-memory mock database active and ready with seeded college records.');
-    return;
-  }
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false },
+  max: 5, // keep pool small for serverless
+  idleTimeoutMillis: 10000,
+  connectionTimeoutMillis: 15000,
+});
 
+// The pool emits an error on behalf of any idle clients it contains
+// if a backend error or network partition happens.
+pool.on('error', (err) => {
+  console.error('❌ Unexpected idle PostgreSQL client error:', err.message);
+});
+
+async function connectDB() {
   try {
-    const client = await poolInstance.connect();
-    console.log('✅ PostgreSQL connected successfully to database');
+    const client = await pool.connect();
+    console.log('✅ PostgreSQL connected to Neon');
     client.release();
   } catch (err) {
-    console.warn('⚠️ Could not connect to PostgreSQL database (' + err.message + '). Falling back to mock database.');
-    isMockActive = true;
+    // Never fall back to a mock database — requests will fail with a
+    // clear 500 until DATABASE_URL is set / the database is reachable.
+    console.error('❌ Failed to connect to the Neon database:', err.message);
   }
 }
 
 function getDB() {
-  if (isMockActive || !poolInstance) {
-    return mockDb;
-  }
-  return poolInstance;
+  return pool;
 }
-
-// Proxy pool for backward compatibility
-const pool = new Proxy({}, {
-  get(target, prop) {
-    const active = getDB();
-    if (typeof active[prop] === 'function') {
-      return active[prop].bind(active);
-    }
-    return active[prop];
-  }
-});
 
 module.exports = { connectDB, getDB, pool };

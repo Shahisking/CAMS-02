@@ -15,6 +15,7 @@ import {
   AuditLog,
   BlockItem,
   RoomItem,
+  Category,
 } from '../types';
 import {
   INITIAL_ASSETS,
@@ -141,6 +142,10 @@ interface AppContextType {
   addBlock: (name: string, description?: string) => Promise<void>;
   updateBlock: (id: string, name: string, description?: string) => Promise<void>;
   deleteBlock: (id: string) => Promise<void>;
+  categories: Category[];
+  addCategory: (category: Omit<Category, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
+  updateCategory: (id: string, updates: Partial<Category>) => Promise<void>;
+  deleteCategory: (id: string) => Promise<void>;
   rooms: RoomItem[];
   addRoom: (room: Omit<RoomItem, 'id'>) => Promise<void>;
   updateRoom: (id: string, updated: Partial<RoomItem>) => Promise<void>;
@@ -253,6 +258,63 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [users, setUsers] = useState<User[]>(INITIAL_USERS);
   const [allocationLogs, setAllocationLogs] = useState<AllocationHistory[]>(INITIAL_ALLOCATION_LOGS);
   const [historyEvents, setHistoryEvents] = useState<HistoryEvent[]>(INITIAL_HISTORY_EVENTS);
+
+  const [categories, setCategories] = useState<Category[]>([
+    { id: 'cat-1', name: 'Computer', icon: 'Monitor', description: 'Workstations, All-In-One PCs, Servers & Thin Clients', isCustom: false, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: 'cat-2', name: 'Projector', icon: 'Projector', description: 'Overhead HD Projectors, Smart Screens & Interactive Displays', isCustom: false, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: 'cat-3', name: 'Printer', icon: 'Printer', description: 'Laser Printers, Copiers, 3D Printers & Scanners', isCustom: false, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: 'cat-4', name: 'Chair', icon: 'Armchair', description: 'Manage all types of chairs including normal, plastic, cushion, and rolling chairs.', isCustom: false, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: 'cat-5', name: 'Table', icon: 'Table', description: 'Computer Lab Workbenches, Conference Tables & Faculty Desks', isCustom: false, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: 'cat-6', name: 'Laboratory Equipment', icon: 'FlaskConical', description: 'Oscilloscopes, CNC Machines, Surveying Total Stations & Testers', isCustom: false, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: 'cat-7', name: 'Sports Equipment', icon: 'Trophy', description: 'Badminton Courts, Cricket Nets, Gym Equipment & Game Tables', isCustom: false, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: 'cat-8', name: 'Library Assets', icon: 'BookOpen', description: 'Steel Bookshelves, RFID Kiosks, Reading Desks & Digital Catalogues', isCustom: false, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: 'cat-9', name: 'Hostel Assets', icon: 'BedDouble', description: 'Double Bunk Beds, Locker Units, Study Units & Mess Furniture', isCustom: false, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: 'cat-10', name: 'Electrical Equipment', icon: 'Zap', description: 'Power Switch Panels, UPS Systems, Motor Testing Benches', isCustom: false, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: 'cat-11', name: 'Fans', icon: 'Fan', description: 'Ceiling fans, wall fans, exhaust fans & pedestal fans', isCustom: false, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: 'cat-12', name: 'LED Lights', icon: 'Lightbulb', description: 'LED tube lights, bulbs, panel lights & outdoor lighting', isCustom: false, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: 'cat-13', name: 'Mini Notice Board', icon: 'Clipboard', description: 'Cork boards, whiteboards & glass notice boards', isCustom: false, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: 'cat-14', name: 'Dustbin', icon: 'Trash2', description: 'Plastic, metal, dry/wet waste & recycling bins', isCustom: false, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: 'cat-15', name: 'Student Bench', icon: 'Sofa', description: 'Wooden and metal benches for students', isCustom: false, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: 'cat-16', name: 'Open Rack', icon: 'Archive', description: 'Open shelving units and storage racks', isCustom: false, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: 'cat-17', name: 'Closed Bureau', icon: 'Archive', description: 'Closed storage cabinets and almirahs', isCustom: false, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: 'cat-18', name: 'Projector Screen', icon: 'Presentation', description: 'Pull-down and motorized projector screens', isCustom: false, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: 'cat-19', name: 'Black Board', icon: 'Columns', description: 'Classic blackboards and chalkboards', isCustom: false, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: 'cat-20', name: 'Computer Table', icon: 'Table', description: 'Specialized tables for computer labs', isCustom: false, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: 'cat-21', name: 'Fire Extinguisher', icon: 'HelpCircle', description: 'Safety equipment and fire extinguishers', isCustom: false, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: 'cat-22', name: 'Staff Cabin Table', icon: 'Table', description: 'Premium tables for staff cabins', isCustom: false, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: 'cat-23', name: 'Staff Table', icon: 'Table', description: 'Standard desks for faculty and staff', isCustom: false, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: 'cat-24', name: 'Small Bench', icon: 'Sofa', description: 'Small seating benches', isCustom: false, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: 'cat-25', name: 'Long Bench', icon: 'Sofa', description: 'Long seating benches for corridors and common areas', isCustom: false, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: 'cat-26', name: 'Drawer', icon: 'Archive', description: 'Storage drawers and filing cabinets', isCustom: false, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: 'cat-27', name: 'First Aid Kit Box', icon: 'BriefcaseMedical', description: 'Medical supplies and first aid kits', isCustom: false, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: 'cat-28', name: 'White Board', icon: 'Presentation', description: 'Dry-erase whiteboards and smart boards', isCustom: false, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: 'cat-29', name: 'Cupboard', icon: 'Columns', description: 'Wooden and steel cupboards', isCustom: false, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: 'cat-30', name: 'Long Lab Switch Table', icon: 'Zap', description: 'Laboratory tables with integrated electrical switches', isCustom: false, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: 'cat-31', name: 'Lab Stool', icon: 'Armchair', description: 'High stools for laboratories', isCustom: false, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: 'cat-32', name: 'Washbasin', icon: 'Droplets', description: 'Washbasins and plumbing fixtures', isCustom: false, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: 'cat-33', name: 'Microphone Speaker', icon: 'Mic', description: 'Microphones and audio speaker systems', isCustom: false, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: 'cat-34', name: 'Camera', icon: 'Camera', description: 'DSLRs, webcams, security cameras, and video equipment', isCustom: false, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: 'cat-35', name: 'Speaker', icon: 'Speaker', description: 'Bluetooth speakers, PA systems, and monitors', isCustom: false, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: 'cat-36', name: 'Other Assets', icon: 'Boxes', description: 'Miscellaneous Facilities, Air Conditioners & Signage', isCustom: false, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+  ]);
+
+  const addCategory = async (category: Omit<Category, 'id' | 'createdAt' | 'updatedAt'>) => {
+    const newCategory: Category = {
+      ...category,
+      id: `cat-${Date.now()}`,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    setCategories(prev => [...prev, newCategory]);
+  };
+
+  const updateCategory = async (id: string, updates: Partial<Category>) => {
+    setCategories(prev => prev.map(cat => (cat.id === id ? { ...cat, ...updates, updatedAt: new Date().toISOString() } : cat)));
+  };
+
+  const deleteCategory = async (id: string) => {
+    setCategories(prev => prev.filter(cat => cat.id !== id));
+  };
   
 
   const toggleDarkMode = () => setIsDarkMode(d => !d);
@@ -311,7 +373,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   // Auth handlers (JWT based)
   const login = async (emailInput: string, passwordInput?: string, roleOverride?: Role): Promise<boolean> => {
     const email = emailInput.trim().toLowerCase();
-    const password = (passwordInput || '').trim();
+    const password = passwordInput || '';   // do NOT trim — bcrypt compares the exact string
     if (!password) return false;
     try {
       const { token, user } = await apiLogin(email, password, roleOverride);
@@ -326,9 +388,16 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       setCurrentUser(mappedUser);
       setActiveTabState('dashboard');
       return true;
-    } catch (e) {
+    } catch (e: any) {
       console.error('Login error', e);
-      return false;
+      // Surface the real backend error (401 invalid credentials, 403 role
+      // mismatch, 500 server error, 404 missing API, network failure, …)
+      // instead of masking everything as an invalid password.
+      if (e?.response) {
+        const serverMessage = e.response?.data?.message;
+        throw new Error(serverMessage || `Login failed (HTTP ${e.response.status}).`);
+      }
+      throw new Error('Cannot reach the authentication server. Please try again later.');
     }
   };
 
@@ -454,6 +523,10 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     addRoom,
     updateRoom,
     deleteRoom,
+    categories,
+    addCategory,
+    updateCategory,
+    deleteCategory,
     selectedRoomFilter,
     setSelectedRoomFilter,
     selectedBlockFilter,

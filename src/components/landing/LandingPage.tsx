@@ -21,15 +21,7 @@ import {
 import { useApp } from '../../context/AppContext';
 
 export const LandingPage: React.FC = () => {
-  const { setActiveTab, login } = useApp();
-
-  const handleQuickDemo = (role: 'Admin' | 'Staff' | 'HOD' | 'Technician') => {
-    let email = 'principal@adithyatech.edu.in';
-    if (role === 'HOD') email = 'hod.cse@adithyatech.edu.in';
-    if (role === 'Staff') email = 'malathi.ece@adithyatech.edu.in';
-    if (role === 'Technician') email = 'technician.mech@adithyatech.edu.in';
-    login(email, role);
-  };
+  const { setActiveTab } = useApp();
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans transition-colors duration-300">
@@ -103,33 +95,6 @@ export const LandingPage: React.FC = () => {
                 >
                   Login to Portal
                 </button>
-              </div>
-
-              {/* Quick Demo Switcher */}
-              <div className="pt-6 border-t border-slate-200 dark:border-slate-800">
-                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3">
-                  Quick Demo Login (One-click access)
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    onClick={() => handleQuickDemo('Admin')}
-                    className="px-3 py-1.5 text-xs font-medium bg-slate-200 dark:bg-slate-800 hover:bg-blue-100 dark:hover:bg-blue-900/40 text-slate-700 dark:text-slate-300 rounded-lg transition-colors border border-slate-300 dark:border-slate-700"
-                  >
-                    👑 Admin (Principal)
-                  </button>
-                  <button
-                    onClick={() => handleQuickDemo('HOD')}
-                    className="px-3 py-1.5 text-xs font-medium bg-slate-200 dark:bg-slate-800 hover:bg-blue-100 dark:hover:bg-blue-900/40 text-slate-700 dark:text-slate-300 rounded-lg transition-colors border border-slate-300 dark:border-slate-700"
-                  >
-                    🎓 HOD (CSE Dept)
-                  </button>
-                  <button
-                    onClick={() => handleQuickDemo('Technician')}
-                    className="px-3 py-1.5 text-xs font-medium bg-slate-200 dark:bg-slate-800 hover:bg-blue-100 dark:hover:bg-blue-900/40 text-slate-700 dark:text-slate-300 rounded-lg transition-colors border border-slate-300 dark:border-slate-700"
-                  >
-                    🛠️ Lab Technician
-                  </button>
-                </div>
               </div>
             </motion.div>
 
