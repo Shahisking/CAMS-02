@@ -2,13 +2,10 @@
 // ALWAYS uses the real Neon PostgreSQL database.
 // There is intentionally no mock/in-memory fallback here: authentication,
 // registration, and login-history must only ever touch the real database.
-const path = require('path');
 const { Pool } = require('pg');
 
-// Local/dev: load backend/.env (works regardless of process cwd).
-// Vercel: this file is not present in the deployment, so process.env
-// (Dashboard → Settings → Environment Variables) is used instead.
-require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
+// Load environment variables. In local dev, looks for .env in cwd.
+// On Vercel/Netlify, environment variables come from the platform dashboard.
 require('dotenv').config();
 
 if (!process.env.DATABASE_URL) {

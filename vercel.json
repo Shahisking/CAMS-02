@@ -5,7 +5,7 @@
   "installCommand": "npm install",
   "framework": null,
   "functions": {
-    "api/index.js": {
+    "api/index.cjs": {
       "memory": 512,
       "maxDuration": 30,
       "includeFiles": "backend/**"

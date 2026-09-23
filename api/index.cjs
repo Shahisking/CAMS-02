@@ -1,41 +1,35 @@
-// api/index.js
+// api/index.cjs
 // Vercel Serverless Function entry point for the CAMS backend API.
 // vercel.json rewrites /api/* → /api/index so the deployed frontend calls
 // the API via the relative base URL '/api' (never a localhost URL).
 //
-// NOTE: root package.json has "type": "module", so this file is ESM.
-// Backend route modules are CommonJS and are imported as ESM defaults.
-//
-// IMPORTANT: this entry MUST stay statically importable and avoid
-// createRequire(import.meta.url) — Vercel's @vercel/node builder bundles the
-// function to CommonJS with esbuild, where `import.meta` is empty and the
-// module would crash at load (ERR_INVALID_ARG_VALUE), making every /api/* call
-// (including login) return 500. Static imports bundle cleanly in both modes.
-import { pathToFileURL } from 'url';
-import express from 'express';
-import cors from 'cors';
+// This file uses CommonJS (require/module.exports) to properly load
+// backend modules that are also CommonJS. The root package.json has
+// "type": "module", so .js files are ESM by default. By using .cjs,
+// require() works correctly and Vercel's bundler handles it properly.
+const express = require('express');
+const cors = require('cors');
 
 // Shared Neon pool from backend/config/db.js.
 // Locally it loads backend/.env; on Vercel it uses environment variables.
-// It has NO mock-database fallback — auth always hits the real database.
-import db from '../backend/config/db.js';
-import authRoutes from '../backend/routes/auth.js';
-import assetRoutes from '../backend/routes/assets.js';
-import allocationRoutes from '../backend/routes/allocations.js';
-import historyRoutes from '../backend/routes/history.js';
-import notificationRoutes from '../backend/routes/notifications.js';
-import userRoutes from '../backend/routes/users.js';
-import blockRoutes from '../backend/routes/blocks.js';
-import roomRoutes from '../backend/routes/rooms.js';
-import requestRoutes from '../backend/routes/requests.js';
-import vendorRoutes from '../backend/routes/vendors.js';
-import maintenanceRoutes from '../backend/routes/maintenance.js';
+const db = require('../backend/config/db.js');
+const authRoutes = require('../backend/routes/auth.js');
+const assetRoutes = require('../backend/routes/assets.js');
+const allocationRoutes = require('../backend/routes/allocations.js');
+const historyRoutes = require('../backend/routes/history.js');
+const notificationRoutes = require('../backend/routes/notifications.js');
+const userRoutes = require('../backend/routes/users.js');
+const blockRoutes = require('../backend/routes/blocks.js');
+const roomRoutes = require('../backend/routes/rooms.js');
+const requestRoutes = require('../backend/routes/requests.js');
+const vendorRoutes = require('../backend/routes/vendors.js');
+const maintenanceRoutes = require('../backend/routes/maintenance.js');
 
 const { getDB, connectDB } = db;
 const pool = getDB();
 connectDB();
 
-// ─── Ensure critical tables exist (non-destructive) ──────────────────────────
+// ─── Ensure critical tables exist (non-destructive) ──────────────────
 async function ensureTablesExist() {
   try {
     await pool.query(`
@@ -69,12 +63,10 @@ async function ensureTablesExist() {
 
 ensureTablesExist();
 
-// ─── Express App ─────────────────────────────────────────────────────────────
+// ─── Express App ─────────────────────────────────────────────────────
 const app = express();
 
 // Same-origin in production (frontend + API share the Vercel domain).
-// origin: true reflects any origin for local/cross-origin testing —
-// API access is still protected by JWT, not by cookies.
 app.use(
   cors({
     origin: true,
@@ -94,7 +86,7 @@ app.use((err, req, res, next) => {
   next(err);
 });
 
-// ─── Health Check ────────────────────────────────────────────────────────────
+// ─── Health Check ────────────────────────────────────────────────────
 app.get('/api/health', async (req, res) => {
   const health = {
     status: 'ok',
@@ -115,7 +107,7 @@ app.get('/api/health', async (req, res) => {
   res.json(health);
 });
 
-// ─── System Stats ────────────────────────────────────────────────────────────
+// ─── System Stats ────────────────────────────────────────────────────
 app.get('/api/system/stats', async (req, res) => {
   try {
     const [usersRes, assetsRes, blocksRes, roomsRes, deptsRes, maintRes, requestsRes] =
@@ -149,7 +141,7 @@ app.get('/api/system/stats', async (req, res) => {
   }
 });
 
-// ─── API Routes ──────────────────────────────────────────────────────────────
+// ─── API Routes ──────────────────────────────────────────────────────
 app.use('/api/auth',          authRoutes);
 app.use('/api/assets',        assetRoutes);
 app.use('/api/allocations',   allocationRoutes);
@@ -162,16 +154,16 @@ app.use('/api/requests',      requestRoutes);
 app.use('/api/vendors',       vendorRoutes);
 app.use('/api/maintenance',   maintenanceRoutes);
 
-// ─── Global Error Handler ────────────────────────────────────────────────────
+// ─── Global Error Handler ────────────────────────────────────────────
 app.use((err, req, res, next) => {
   console.error('Unhandled API error:', err.message);
   res.status(500).json({ message: 'Internal Server Error' });
 });
 
-export default app;
+module.exports = app;
 
-// Local testing only: `node api/index.js` (Vercel invokes the exported app).
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+// Local testing only: `node api/index.cjs`
+if (require.main === module) {
   const PORT = process.env.PORT || 5001;
   app.listen(PORT, () => console.log(`API listening on http://localhost:${PORT}`));
 }
